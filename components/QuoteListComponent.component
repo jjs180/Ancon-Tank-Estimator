@@ -1,0 +1,29 @@
+<apex:component controller="QuoteController">
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <apex:form >
+                <c:ProjectTableComponent targetPbTableIds="pbt"  pageSizeOptions="5,10,15,30" defaultPageSize="10" enableExport="true"/>
+                <apex:pageBlock mode="maindetail" id="pb">                     
+                   <apex:pageblocksection title="Quotes" columns="1" collapsible="false" id="tableTitle">
+                       <apex:pageblockTable value="{!quotes}" var="q" id="pbt" styleClass="table-striped">
+                            <apex:column headerValue="Customer" value="{!q.Account__c}" style="width:223px;"/>
+                            <apex:column headerValue="Quote#" value="{!q.Name}" style="width:117px;"/>
+                            <apex:column value="{!q.PO__c}" style="width:100px;"/>                          
+                            <apex:column value="{!q.Tank__c}" style="width:88px;"/>
+                            <apex:column value="{!q.Location__c}" style="width:180px;"/>
+                            <apex:column headerValue="Amount" value="{!q.Lump_Sum_Total__c}" style="width:152px;"/>
+                            <apex:column value="{!q.Days__c}" style="width:74px;"/>
+                            <apex:column value="{!q.Status__c}" style="width:124px;"/>
+                        </apex:pageblockTable>
+                    </apex:pageblocksection>
+                    <!-- apex:pageBlockButtons >
+                        <apex:commandButton value="Rerender" oncomplete="initPageBlockTableEnhancerADV();" rerender="pb"/>
+                    </apex:pageBlockButtons-->
+                </apex:pageBlock>
+            </apex:form>
+        </div>
+    </div>
+</div>
+
+</apex:component>
