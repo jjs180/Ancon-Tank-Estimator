@@ -1,0 +1,152 @@
+<apex:page cache="false" sidebar="false"  showHeader="false"  standardStylesheets="false" docType="html-5.0" >	
+	<html lang="en" class=" js no-touch csstransforms3d csstransitions webkit chrome win js" style="height: auto;">
+	<!-- html-->
+  		<head>
+    		<title>Tank Estimator</title>
+			<!-- apex:stylesheet value="{!URLFOR($Resource.static, 'css/cssFile.css')}"/-->				
+			<apex:stylesheet value="{!URLFOR($Resource.static, 'css/bootstrap.css')}"/>				
+			<apex:stylesheet value="{!URLFOR($Resource.static, 'css/font-awesome.css')}"/>			
+			<apex:stylesheet value="{!URLFOR($Resource.static, 'css/theme.css')}"/>				
+			<!--apex:stylesheet value="{!URLFOR($Resource.static, 'css/theme-elements.css')}"/-->				
+			<!--apex:stylesheet value="{!URLFOR($Resource.static, 'css/theme-blog.css')}"/-->				
+			<!--apex:stylesheet value="{!URLFOR($Resource.static, 'css/theme-shop.css')}"/-->				
+			<!--apex:stylesheet value="{!URLFOR($Resource.static, 'css/theme-animate.css')}"/-->				
+			<!--apex:stylesheet value="{!URLFOR($Resource.static, 'css/theme-responsive.css')}"/-->				
+			<apex:stylesheet value="{!URLFOR($Resource.static, 'css/default.css')}"/>
+					
+			<apex:stylesheet value="{!URLFOR($Resource.static, 'css/custom.css')}"/>						
+			<apex:stylesheet value="{!URLFOR($Resource.static, 'css/style3.css')}"/>				
+			<!--apex:stylesheet value="{!URLFOR($Resource.static, 'css/bootstrap-responsive.min.css')}"/-->	
+	    	<!--apex:includeScript value="{!URLFOR($Resource.static, 'js/respond.min.js')}"/-->	
+		    <!--apex:includeScript value="{!URLFOR($Resource.static, 'js/modernizr.js')}"/-->
+		    <!-- apex:includeScript value="{!URLFOR($Resource.static, 'js/money.jquery.js')}"/-->
+		    
+		    <script type="text/javascript">var __sfdcSessionId = '{!GETSESSIONID()}';</script>
+			<script src="/soap/ajax/32.0/connection.js" type="text/javascript"></script>
+			
+			<style>
+				ff {
+					height:40px;
+				}
+				.ffl {
+					float:left;
+					/*width:180px;*/
+					padding-top:12px;
+					padding-right:5px;
+				}
+				.ffc {
+					padding-top: 8px;
+					float:left;
+					/*width:150px;*/
+				}				
+				.fr {
+					height:35px;
+				}
+				.fr:hover {
+					background-color:#f7f7f7;
+				}
+				.frl {
+					float:left;width:120px;
+					padding-top:8px;
+					padding-right:5px;
+				}
+				.frc {
+					float:left;
+					width:120px;
+				}				
+				.fd {
+					height:35px;
+				}
+				.fdl {
+					float:left;
+					width:120px;
+					padding-top:8px;
+					padding-right:5px;
+				}
+				.fdc {
+					float:left;
+					width:80px;
+				}
+				#footer2 {
+					position: relative;
+					margin-top: -150px; 
+					height: 40px;
+					clear:both;
+				} 
+				.outputs{
+					padding-left: 0px;
+				}
+				.detail{
+					font-size:18px;
+					line-height: 24px;
+					padding-top:0px;
+				}
+				.form-control{
+					padding-left:5px;
+					padding-right: 5px;
+				}
+				span .form-control{
+					background-color:#eee
+				}
+				a.tooltips {
+				  position: relative;
+				  display: inline;
+				}
+				a.tooltips span {
+				  padding: 10px;
+				  font-weight: bold;
+				  width: 170px;
+				  position: absolute;
+				 /* width:auto;*/
+				  color: #000000;
+				  background: #F6BD00;
+				  height: auto;
+				  /*line-height: 54px;*/
+				  text-align: left;
+				  visibility: hidden;
+				  border-radius: 6px;
+				}
+				a.tooltips span:after {
+				
+				  content: '';
+				  position: absolute;
+				  top: 100%;
+				  left: 50%;
+				  margin-left: -8px;
+				  width: 0; height: 0;
+				  border-top: 8px solid #F6BD00;
+				  border-right: 8px solid transparent;
+				  border-left: 8px solid transparent;
+				}
+				a:hover.tooltips span {
+				  visibility: visible;
+				  opacity: 0.8;
+				  bottom: 30px;
+				  left: 50%;
+				  margin-left: -76px;
+				  z-index: 999;
+				}
+			</style>
+			 
+		</head>
+  		<body > 
+  				<c:header /> 		
+  			
+				<c:Quote2 /> 
+ 
+  				<!-- c:footer /-->
+ 
+  				<apex:includeScript value="{!URLFOR($Resource.static, 'js/jquery-2.1.4.js')}" />
+  				<apex:includeScript value="{!URLFOR($Resource.static, 'js/jquery-ui.js')}" />
+  				<apex:includeScript value="{!URLFOR($Resource.static, 'js/bootstrap.js')}" />
+  				<apex:includeScript value="{!URLFOR($Resource.static, 'js/bootstrap-dropdown.js')}" />	
+				<apex:includeScript value="{!URLFOR($Resource.static, 'js/jquery.validate.js')}" />													
+				<!-- apex:includeScript value="{!URLFOR($Resource.static, 'js/theme.plugins.js')}" /-->				
+				<!-- apex:includeScript value="{!URLFOR($Resource.static, 'js/theme2.js')}" /--> 
+			    <apex:includeScript value="{!URLFOR($Resource.static, 'js/knockout.js')}" /> 
+			    <apex:includeScript value="{!URLFOR($Resource.static, 'js/knockout.validation.js')}" />  
+
+			<c:QuoteJS />
+  		</body>  
+	</html>    
+</apex:page>

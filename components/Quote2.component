@@ -1,0 +1,600 @@
+<apex:component controller="QuoteController">
+<div class="main" role="main">
+	<div class="container" style="padding-top:50px;">						
+			<div data-bind="visible: calculateQuoteSection" style="padding-top:50px;">
+			
+				<div class="col-md-12" style="padding-bottom:30px;">
+					<div class="col-md-6">
+						<span style="font-size:26px;color:#000;">Tank Estimator Tool</span>
+					</div>
+					<div class="ffl col-md-2">Select Job Type</div>
+					<div class="ffc col-md-3" >
+						<select class="form-control" style=" width:100%;" tabindex="2" data-bind='options: jobTypeChoices, optionsCaption: "Select", value: jobType, valueUpdate :"afterkeydown",enable: isEdit'></select>
+				 	</div>
+				</div>								
+				<div class="col-md-6" data-bind="visible: tankDetails">
+					<div class="col-md-12" >						
+						<h4><strong>Tank</strong> Details</h4>					
+					</div>							
+					<!-- div class="ffl col-md-6">Company/Customer</div>
+					<div class="ffc col-md-6" >
+						<input id="" type="text" readonly="readonly" class="form-control" style="width:100%" data-bind="value : company" />									
+						<select class="form-control" data-bind='options: companyChoices, optionsCaption: "Select", value: company, valueUpdate: "afterkeydown"' style="width: 100%;"></select>		                                          
+                	</div-->
+                	
+                	<!-- div class="ffl col-md-4"><a class="tooltips" href="#">Tank Diameter (ft)<span>This is the diameter of the tank</span></a></div-->
+                	
+					<div class="ffl col-md-4">Tank Diameter (ft)</div>
+					<div class="ffc col-md-2" >
+						<input id="" type="text" class="form-control" style="width:100%" data-bind="value : tankDiameter, valueUpdate: 'afterkeydown', enable: isEdit" placeholder="Diameter" tabindex="2"/>
+					</div>												
+					<div class="ffl col-md-3"><a class="tooltips" >Hours per Shift<span>For straight time overtime and shift count.</span></a></div>
+					<div class="ffc col-md-3" >
+						<select class="form-control" style=" width:100%;" tabindex="2" data-bind='options: hoursPerShiftChoices, optionsCaption: "Select", value: hoursPerShift, valueUpdate :"afterkeydown",enable: isEdit'></select>
+				 	</div>								
+					<div class="ffl col-md-6">Location</div>
+					<div class="ffc col-md-6">
+						<select id="" class="form-control" style=" width:100%;" tabindex="3" data-bind='options: locationChoices, optionsCaption: "Select", value: location, valueUpdate: "afterkeydown",enable: isEdit'></select>
+					</div>								
+					<div class="ffl col-md-4">Pontoon Type</div>
+				 	<div class="ffc col-md-3">
+				 		<select id="" class="form-control" style="width:100%;" tabindex="4" data-bind='options: pontoonChoices, optionsCaption: "Select", value: pontoonType, valueUpdate: "afterkeydown",enable: isEdit'></select>										
+					</div>						 
+					<div class="ffl col-md-4"><a class="tooltips" >Clean Pontoon<span>No means take pontoon cleaning our out.</span></a></div>
+				 	<div class="ffc col-md-1" style="text-align:center;">
+				 		<input type="checkbox" data-bind="checked: cleanPontoon" tabindex="5"/>				 																				 		
+					</div>								 
+					 <div class="ffl col-md-6" style="clear:both;">Vacum Trucks</div>
+					 <div class="ffc col-md-6" >
+					 	<select id="" class="form-control" style="width:100% " tabindex="6" data-bind='options: vacTruckChoices, optionsCaption: "Select", value: vacumTrucks, valueUpdate: "afterkeydown",enable: isEdit'></select>
+					 	<!-- input id="" type="text" class="form-control" style="width:100%" data-bind="value : vacumTrucks, valueUpdate: 'afterkeydown',enable: isEdit" placeholder="Vacum Trucks" tabindex="6"/-->				 																		 								 		
+					</div>								
+					<div class="ffl col-md-6" style="clear:both;">Truck Size</div>
+				 	<div class="ffc col-md-6">
+				 		<select id="" class="form-control" style="width:100% " tabindex="7" data-bind='options: truckSizeChoices, optionsCaption: "Select", value: truckSize, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 								 		
+					</div>								
+					<div class="ffl col-md-6" style="clear:both;">Drain Method</div>
+				 	<div class="ffc col-md-6">
+				 		<select id="" class="form-control" style="width:100% " tabindex="8" data-bind='options: drainMethodChoices, optionsCaption: "Select", value: drainMethod, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 									 		
+					</div>								
+					<div class="ffl col-md-6">Product</div>
+				 	<div class="ffc col-md-6">
+				 		<select id="" class="form-control" style="width:100% " tabindex="9" data-bind='options: productChoices, optionsCaption: "Select", value: product, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 		
+					</div>
+					<div data-bind="visible: crudeTool()">
+						<div class="ffl col-md-6">Product Above 5 Ft.</div>
+					 	<div class="ffc col-md-6">
+					 		<select id="" class="form-control" style="width:100% " tabindex="10" data-bind='options: productAbove5FtChoices, optionsCaption: "Select", value: productAbove5Ft, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 		
+						</div>
+					</div>
+					<div data-bind="visible: crudeTool()">	
+						<div class="ffl col-md-4">Remaining (ft)</div>
+					 	<div class="ffc col-md-2">
+					 		<input id="Diameter" type="text" class="form-control" style="width:100%" data-bind="value : remainingFt, valueUpdate: 'afterkeydown',enable: isEdit" placeholder="Remaining (ft)" tabindex="11"/>
+					 	</div>	
+					</div>
+					<div>							
+						<div class="ffl col-md-4">Remaining (in)</div>
+					 	<div class="ffc col-md-2">
+					 		<input id="Diameter" type="text" class="form-control" style="width:100%" data-bind="value : remainingIn, valueUpdate: 'afterkeydown',enable: isEdit" placeholder="Remaining (in)" tabindex="10"/>
+					 	</div>
+					</div>
+					<div data-bind="visible: !crudeTool()">
+						<div class="ffl col-md-6" style="clear:both;">Barrels Scale</div>
+					 	<div class="ffc col-md-6">
+					 		<select id="" class="form-control" style="width:100% " tabindex="8" data-bind='options: scaleChoices, optionsCaption: "Select", value: scale, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 									 		
+						</div>	
+					</div>
+					<div data-bind="visible: !crudeTool()">
+						<div class="ffl col-md-6" style="clear:both;">Wash Type</div>
+					 	<div class="ffc col-md-6">
+					 		<select id="" class="form-control" style="width:100% " tabindex="8" data-bind='options: washTypeChoices, optionsCaption: "Select", value: washType, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 									 		
+						</div>	
+					</div>
+					<div>		
+					 	<div class="ffl col-md-6" style="clear:both;"><a class="tooltips" >Rescue Team<span>Ancon provides dedicated rescue team for the project.</span></a></div>
+					 	<div class="ffc col-md-6">
+					 		<select id="" class="form-control" style="width:100% " tabindex="16" data-bind='options: rescueTeamChoices, optionsCaption: "Select", value: rescueTeam, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 										 		
+						</div>
+					</div>
+					<div data-bind="visible: crudeTool()">		
+					 	<div class="ffl col-md-4  "><a class="tooltips" >Roof Access<span>Changes the equipment used if we are able to install cannons on the roof.</span></a></div>
+					 	<div class="ffc col-md-2" style="text-align:center;" tabindex="11">
+					 		<input type="checkbox" data-bind="checked: roofAccess,enable: isEdit"/>																		 										 		
+						</div>
+					</div>
+					<div data-bind="visible: crudeTool()">	
+						<div class="ffl col-md-4  " >Entry Cleaning Required</div>
+					 	<div class="ffc col-md-2" style="text-align:center;" tabindex="12">
+					 		<input type="checkbox" data-bind="checked: entryCleaningRequired,enable: isEdit"/>																		 										 		
+						</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">		
+						<div class="ffl col-md-4  " >Treatment Needed</div>
+					 	<div class="ffc col-md-2" style="text-align:center;" tabindex="13">
+					 		<input type="checkbox" data-bind="checked: treatmentNeeded,enable: isEdit"/>																		 										 		
+						</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">		
+						<div class="ffl col-md-4 " ><a class="tooltips" >Remove Seal<span> Cut out seal and remove from tank.</span></a></div>
+					 	<div class="ffc col-md-2" style="text-align:center;" tabindex="14">
+					 		<input type="checkbox" data-bind="checked: removeSeal,enable: isEdit"/>																		 										 		
+						</div>	
+					 </div>
+					 <div data-bind="visible: crudeTool()">		
+						<div class="ffl col-md-4" ><a class="tooltips" >Clean Seal<span>Pull back secondary and wash behild and remove debris from top of seal. </span></a></div>
+					 	<div class="ffc col-md-2" style="text-align:center;" tabindex="15">
+					 		<input type="checkbox" data-bind="checked: cleanSeal,enable: isEdit"/>																		 										 		
+						</div>	
+					</div>				
+					<div class="ffl col-md-4"><a class="tooltips" >Set Legs<span>Ancon enters onto the roof of the tank to set the legs.</span></a></div>
+				 	<div class="ffc col-md-2" style="text-align:center;">
+				 		<input type="checkbox" data-bind="checked: setLegs,enable: isEdit" tabindex="17"/>																		 										 		
+					</div>																																								
+					<div class="ffl col-md-4" ><a class="tooltips" >Degas Support<span>While degassing Ancon will provide a team to wash from the manway to remove and solids to expiditate the degassing process.</span></a></div>
+				 	<div class="ffc col-md-2" style="text-align:center;">
+				 		<input type="checkbox" data-bind="checked: degasSupport,enable: isEdit" tabindex="19"/>
+					</div>	
+					<div data-bind="fadeVisible: degasSupport">					
+						<div class="ffl col-md-4" ><a class="tooltips" >Degas Support Hours<span>Amount of hours for the degassing crews.</span></a></div>
+					 	<div class="ffc col-md-2" style="padding-top:8px;">
+					 		<input type="text" class="form-control" style="width:100%" data-bind="value : degasSupportHours, valueUpdate: 'afterkeydown',enable: isEdit" placeholder="Degas Support Hours" tabindex="20"/>
+					 	</div>
+				 	</div>
+					<div>	 	
+					 	<div class="ffl col-md-4" ><a class="tooltips" >Cribbing<span>Ancon provides and installs cribbing blocks per API standard .</span></a></div>
+					 	<div class="ffc col-md-2" style="text-align:center;">
+					 		<input type="checkbox" data-bind="checked: cribbing,enable: isEdit" tabindex="18"/>				 		
+						</div>	
+					 </div>
+					 <div data-bind="visible: crudeTool()">		
+						<div class="ffl col-md-4" ><a class="tooltips" >Frac Tanks<span>Ancon supply Frac Tanks.</span></a></div>
+					 	<div class="ffc col-md-2" style="text-align:center;">
+					 		<input type="checkbox" data-bind="checked: fracTanks,enable: isEdit" tabindex="18"/>				 		
+						</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">	
+						<div data-bind="fadeVisible: fracTanks">					
+							<div class="ffl col-md-4" ><a class="tooltips" >FracTanks Needed<span>The amount of tanks needed.</span></a></div>
+						 	<div class="ffc col-md-2" style="padding-top:8px;">
+						 		<input type="text" class="form-control" style="width:100%" data-bind="value : fracTanksNeeded, valueUpdate: 'afterkeydown',enable: isEdit" placeholder="Frac Tanks Needed" tabindex="21"/>
+						 	</div>
+					 	</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">	
+					 	<div class="ffl col-md-4" >Vacuum Truck Support</div>
+					 	<div class="ffc col-md-2" style="text-align:center;">
+					 		<input type="checkbox" data-bind="checked: vacuumTruckSupport,enable: isEdit" tabindex="22"/>				 		
+						</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">	
+						<div class="ffl col-md-4" ><a class="tooltips" >vFrac Drain Down<span>Ancon supplys vacuum truck to drain the frac tanks and offload at a designated location on facilty.</span></a></div>
+					 	<div class="ffc col-md-2" style="text-align:center;">
+					 		<input type="checkbox" data-bind="checked: vFracDrainDown,enable: isEdit" tabindex="23"/>		 		
+						</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">	
+						<div class="ffl col-md-4" ><a class="tooltips" >vFrac Skimming<span>Ancon supplys vacuum truck to skim the oil from the frac tanks and offload at a designated location on facilty.</span></a></div>
+					 	<div class="ffc col-md-2" style="text-align:center;">
+					 		<input type="checkbox" data-bind="checked: vFracSkimming,enable: isEdit" tabindex="24"/>				 		
+						</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">	
+						<div class="ffl col-md-4" ><a class="tooltips" >vFinal Wash<span>Clean to a gass free condition.</span></a></div>
+					 	<div class="ffc col-md-2" style="text-align:center;">
+					 		<input type="checkbox" data-bind="checked: vFinalWash,enable: isEdit" tabindex="25"/>				 		
+						</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">	
+						<div class="ffl col-md-4" ><a class="tooltips" >vBlinding<span>Vaccuum truck support for blinding operations.</span></a></div>
+					 	<div class="ffc col-md-2" style="text-align:center;">
+					 		<input type="checkbox" data-bind="checked: vBlinding,enable: isEdit" tabindex="26"/>				 		
+						</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">	
+						<div class="ffl col-md-4" >vDegas</div>
+					 	<div class="ffc col-md-2" style="text-align:center;">
+					 		<input type="checkbox" data-bind="checked: vDegas,enable: isEdit" tabindex="27"/>				 		
+						</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">		
+						<div class="ffl col-md-4" ><a class="tooltips" >vPontoon Cleaning<span>If liquid is in the pontoons prior to bidding and operations knows they need cleaned.</span></a></div>
+					 	<div class="ffc col-md-2" style="text-align:center;">
+					 		<input type="checkbox" data-bind="checked: vPontoonCleaning,enable: isEdit" tabindex="28"/>				 		
+						</div>
+					 </div>
+					 <div data-bind="visible: crudeTool()">	
+						<div class="ffl col-md-4" >vSeal Cleaning</div>
+					 	<div class="ffc col-md-2" style="text-align:center;">
+					 		<input type="checkbox" data-bind="checked: vSealCleaning,enable: isEdit" tabindex="29"/>				 		
+						</div>	
+					</div>									
+				</div><!-- end div below tank -->
+				<div class="col-md-6" data-bind="visible: outputs()">											
+					<div class="col-md-12" >
+						<h4>Notes</h4>				
+						<textarea data-bind="textInput: notes,enable: isEdit" maxlength="3000" placeholder="Please enter your notes." rows="6" class="form-control" id=""></textarea>
+					</div>					
+					<div class="col-md-12" style="text-align:center;padding-top:22px;">
+						<input type="submit" value="Calculate" class="btn btn-primary btn-lg" data-loading-text="Loading..." data-bind="click: calculateQuote, enable: isEdit"/>
+						<input type="submit" value="Edit" class="btn btn-primary btn-lg" data-loading-text="Loading..." data-bind="click: editQuote, disable: isEdit"/>					
+					</div>
+					<div class="col-md-12" style="float:left;padding-top:22px;">
+							<h4>Estimates</h4>							
+							<div class="ffl col-md-3 outputs" >Equipment</div>
+						 	<div class="ffc col-md-3">	
+						 		<span class="form-control" style="width:100%" data-bind="currency :equipmentOutput, symbol: '$'" ></span>					 		
+						 	</div>
+						 	<div class="ffl col-md-3 outputs">Materials</div>
+						 	<div class="ffc col-md-3">
+						 		<span class="form-control" style="width:100%" data-bind="currency : materialsOutput, symbol: '$'" ></span>
+						 	</div>
+						 	<div class="ffl col-md-3 outputs">Labor</div>
+						 	<div class="ffc col-md-3">
+						 		<span class="form-control" style="width:100%" data-bind="currency : laborOutput, symbol:'$'" ></span>
+						 	</div>
+						 	<div class="ffl col-md-3 outputs">Rescue</div>
+						 	<div class="ffc col-md-3">
+						 		<span class="form-control" style="width:100%" data-bind="currency: rescueOutput, symbol:'$' " ></span>
+						 	</div>
+						 	<div class="ffl col-md-3 outputs">Per Diem</div>
+						 	<div class="ffc col-md-3">
+						 		<span class="form-control" style="width:100%" data-bind="currency: perDiemOutput, symbol:'$'" ></span>
+						 	</div>
+						 	<div class="ffl col-md-3 outputs">Rescue Per Diem</div>
+						 	<div class="ffc col-md-3">
+						 		<span class="form-control" style="width:100%" data-bind="currency : rescuePerDiemOutput, symbol:'$'" ></span>
+						 	</div>
+						 	<div data-bind="visible: !crudeTool()">
+						 		<div class="ffl col-md-3 outputs">Degas Support</div>
+							 	<div class="ffc col-md-3">
+							 		<span class="form-control" style="width:100%" data-bind="currency : degasSupportOutput, symbol:'$'" ></span>
+							 	</div>
+						 	</div>
+						</div>
+						<div class="col-md-12" style="float:left;padding-top:22px;">						 	
+						 	<div class="ffl col-md-4 col-md-offset-2 outputs">Lump Sum</div>
+						 	<div class="ffc col-md-3">
+						 		<span class="form-control" style="width:100%" data-bind="currency : lumpSumOutput, symbol:'$'" ></span>
+						 	</div>	
+						 	<div data-bind="visible: crudeTool()">
+							 	<div class="ffl col-md-4 col-md-offset-2 outputs">Total Inches Remain</div>
+							 	<div class="ffc col-md-3">
+							 		<span class="form-control" style="width:100%" data-bind="text : totalInchesRemainOutput" ></span>
+							 	</div>	
+						 	</div>
+						 	<div data-bind="visible: crudeTool()">
+							 	<div class="ffl col-md-4 col-md-offset-2 outputs">Total Barrels</div>
+							 	<div class="ffc col-md-3">
+							 		<span class="form-control" style="width:100%" data-bind="text : totalBarrelsOutput" ></span>
+							 	</div>
+							 </div>
+						 	<div class="ffl col-md-4 col-md-offset-2 outputs">All Pricing Is Lump Sum</div>					 																
+						</div>
+<!-- Create Quote section -->
+						<div class="col-md-12" style="text-align:center;padding-top:22px;" data-bind="fadeVisible: createQuoteButton">
+							<input type="submit" value="Create Quote" class="btn btn-primary btn-lg" data-loading-text="Loading..." data-bind="click: openSubmitQuoteSection, disable: isEdit"/>											
+						</div>
+<!-- submit quote section   -->
+						<div class="col-md-12" style="float:left;padding-top:22px;" data-bind="fadeVisible: submitQuoteSection">						
+							<div class="ffl col-md-3 outputs" >Tank Number:</div>
+						 	<div class="ffc col-md-3">						 		
+						 		<input id="" type="text" class="form-control" style="width:100%" data-bind="value : tankNumber" />
+						 	</div>
+						 	<div class="ffl col-md-3 outputs">Estimated Start Date:</div>
+						 	
+						 	
+						 	
+						 	
+						 	
+						 	
+						 	<div class="ffc col-md-3">
+							 	<input placeholder="Date" id="estimatedStartDate" class="textAnswer" type="text" data-bind="value : estimatedStartDate, valueUpdate: 'afterkeydown'"/>              		                		
+		                		<input type="hidden" id="estimatedStartDate_alternate" />
+						        <script type="text/javascript">      
+						            j$ = jQuery.noConflict();       
+						            j$(document).ready(function() {
+						                j$( "#estimatedStartDate" ).datepicker({
+						                    //defaultDate: "+1w",
+						                    yearRange: "-20:c",
+						                    changeMonth: true,
+						                    changeYear: true,
+						                    numberOfMonths: 1,
+						                    dateFormat:"mm-dd-yy",
+						                    altField: "#estimatedStartDate_alternate",
+						                    altFormat: "yy-mm-dd",
+						                    showAnim: "slide"
+						                })
+						            });						                               
+						        </script> 		
+						 	</div>
+						 	
+						 	
+						 	
+						 	
+						 	
+						 	<!-- div class="ffc col-md-3">
+						 		<apex:form >						 			
+						 			<apex:input id="estimatedStartDate" value="{!jobDate}" type="auto"  styleClass="form-control" style="width:auto;" />
+						 		</apex:form>
+						 	</div-->
+						 	<div class="col-md-12" style="text-align:center;padding-top:22px;" >
+								<input type="submit" value="Submit Quote" class="btn btn-primary btn-lg" data-loading-text="Loading..."  data-bind="click: submitQuote, disable: isEdit"/>											
+							</div>						 	
+						</div>														
+       			</div>
+       			<!-- div class="col-md-12">
+       				<div>
+							<h5><strong>Assumptions</strong></h5>
+							<div style="padding-left:20px;">
+							
+							<p>Pricing is based on information provided and is subject to review and approval by Ancon.<br/>
+							Total Cost is Lump Sum project price.<br/>
+							Pricing is based on ONE hour for permits prior to start of work.<br/>
+							Any delays not caused by Ancon will be billed at T&amp;M contract rates.<br/>
+							Price is based on Tank being prepared for entry prior to arrival.<br/>
+							All waste accumulated during project to remain on site and is the responsibility of the customer.<br/>
+							All water, utilities and toilet facilities will be supplied by others. <br/>
+							This Proposal is based upon normal working hours Monday through Friday.<br/>
+							This proposal is based upon non-prevailing wage.<br/>
+							Ancon requires a PO prior to the start of any work. <br/>
+							A Safe Work Execution Plan (SWEP) can be drafted upon request for the subject project. <br/>
+							Pricing is portal to portal.<br/>
+							Crane support has not been included within this proposal and is to be provided by others. <br/>
+							Vapor control/degassing is to be supplied by others. <br/>
+							A fork lift is to be supplied by others. <br/>
+							Fresh Air/Bottle Watch will be <input id="FreshAirV" type="text" readonly="readonly" value="" name="FreshAirV" tabindex="-1" style="border=0px;width:400px;border:0px;"/><br/>
+							All Pontoon Cleaning is assumed Dry Sweep Only and no more than 3 Bags of material.<br/>
+							Cribbing pricing is based on <input id="TotalCribTowers" type="text" readonly="readonly" value="0" name="TotalCribTowers" tabindex="-1" size="1" style="border:0px;"/> towers, each additional tower will be billed 
+							at $ <input id="TCribCostPerTower" type="text" readonly="readonly" value="-" name="TCribCostPerTower" tabindex="-1" size="5" style="border:0px;"/>.<br/>
+							</p>
+							</div>
+						</div>      			
+       			</div-->
+		</div>
+		<div class="col-md-12" data-bind="visible: quoteDetailSection">
+			<div class="row" style="padding-bottom:25px;">
+				<div class="col-md-6" style="padding-top:15px;">
+					<span style="font-size:26px;color:#000;">Quote #&nbsp;<span data-bind="text: quoteNumber"></span></span>
+				</div>
+				<div class="col-md-6">
+					<div class="alert alert-success" style="width:400px;margin-top: 2px;margin-left: auto ; margin-right: auto ;text-align:center;">
+	                     <strong>Quote Created Successfully </strong>                           
+	                </div>
+				</div>
+			</div>
+			<div class="row">		
+				<div class="col-md-6" style="padding-left:0px;">					
+						<div class="col-md-12"><h4><strong>Tank</strong> Details</h4></div>							
+						<div class="ffl col-md-4 detail">Customer</div>
+						<div class="ffl col-md-4 detail" style="font-weight:bold;" >
+							<span  style="width:100%" > {!companyName}</span>									
+						</div>
+						<div class="ffl col-md-4 detail" style="clear:both;">Tank Diameter (ft)</div>
+						<div class="ffl col-md-2 detail" style="font-weight:bold;">
+							<span style="width:100%" data-bind="text: tankDiameter"></span>
+						</div>												
+						<div class="ffl col-md-4 detail">Hours per Shift</div>
+						<div class="ffl col-md-2 detail" style="font-weight:bold;">
+							<span style="width:100%;"  data-bind="text: hoursPerShift"></span>
+					 	</div>								
+						<div class="ffl col-md-4 detail">Location</div>
+						<div class="ffl col-md-4 detail" style="font-weight:bold;">
+							<span style=" width:100%;"  data-bind="text: location"></span>
+						</div>					
+						<div class="ffl col-md-4 detail" style="clear:both;">Pontoon Type</div>
+					 	<div class="ffl col-md-3 detail" style="font-weight:bold;">
+					 		<span  style="width:100%;" data-bind="text: pontoonType"></span>										
+						</div>						 
+						<div class="ffl col-md-4 detail" style="clear:both;">Clean Pontoon</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: cleanPontoon()?'Yes':'No'"></span>				 																				 		
+						</div>								 
+						 <div class="ffl col-md-4 detail" >Vacum Trucks</div>
+						 <div class="ffl col-md-2 detail" style="font-weight:bold;">
+						 	<span style="width:100%;" data-bind="text : vacumTrucks"></span>			 																	 		
+						</div>								
+						<div class="ffl col-md-4 detail" >Truck Size</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span style="width:100%;" data-bind="text: truckSize"></span>															 							
+					 	</div>				 	
+					 	<div class="ffl col-md-4 detail" style="clear:both;">Drain Method</div>
+					 	<div class="ffl col-md-3 detail" style="font-weight:bold;">
+					 		<span style="width:100%;" data-bind="text: drainMethod"></span>												 								 		
+						</div>								
+						<div class="ffl col-md-4 detail" style="clear:both;">Product</div>
+					 	<div class="ffl col-md-4 detail" style="font-weight:bold;">
+					 		<span style="width:100%;"  data-bind="text: product"></span>																		 		
+						</div>
+						<div class="ffl col-md-6 detail" style="clear:both;">Product Above 5 Ft.</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span style="width:100%;" data-bind="text: productAbove5Ft"></span>																		 		
+						</div>	
+						<div class="ffl col-md-4 detail" style="clear:both;">Remaining (ft)</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span style="width:100%;" data-bind="text: remainingFt" ></span>"
+					 	</div>							
+						<div class="ffl col-md-4 detail">Remaining (in)</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span style="width:100%;" data-bind="text: remainingIn" ></span>'
+					 	</div>
+					 	<div class="ffl col-md-4 detail" style="clear:both;">Rescue Team</div>
+					 	<div class="ffl col-md-4 detail" style="font-weight:bold;">
+					 		<span style="width:100%;" data-bind="text: rescueTeam"></span>																		 										 		
+						</div>					
+						<div class="ffl col-md-4 detail" style="clear:both;">Roof Access</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: roofAccess()?'Yes':'No'"></span>																		 										 		
+						</div>
+						<div class="ffl col-md-6 detail" style="clear:both;">Entry Cleaning Required</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: entryCleaningRequired()?'Yes':'No'"></span>																		 										 		
+						</div>
+						<div class="ffl col-md-4 detail" style="clear:both;">Treatment Needed</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: treatmentNeeded()?'Yes':'No'"></span>																		 										 		
+						</div>
+						<div class="ffl col-md-4 detail" >Remove Seal</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: removeSeal()?'Yes':'No'"></span>																		 										 		
+						</div>	
+						<div class="ffl col-md-4 detail" >Clean Seal</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: cleanSeal()?'Yes':'No'"></span>																		 										 		
+						</div>					
+						<div class="ffl col-md-4 detail">Set Legs</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: setLegs()?'Yes':'No'"></span>																		 										 		
+						</div>																																								
+						<div class="ffl col-md-4 detail" >Degas Support</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: degasSupport()?'Yes':'No'"></span>
+						</div>
+						<div class="ffl col-md-6 detail" style="clear:both;">Degas Support Hours</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span  style="width:100%;" data-bind="text : degasSupportHours"></span>
+					 	</div>
+						<div class="ffl col-md-4 detail" style="clear:both;">Cribbing</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: cribbing()?'Yes':'No'"></span>				 		
+						</div>	
+						<div class="ffl col-md-4 detail" >Frac Tanks</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: fracTanks()?'Yes':'No'"></span>				 		
+						</div>
+						<div class="ffl col-md-4 detail" >FracTanks Needed</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span style="width:100%;" data-bind="text : fracTanksNeeded" ></span>
+					 	</div>
+					 	<div class="ffl col-md-6 detail" style="clear:both;">Vacuum Truck Support</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: vacuumTruckSupport()?'Yes':'No'"></span>				 		
+						</div>
+						<div class="ffl col-md-4 detail" style="clear:both;">vFrac Drain Down</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: vFracDrainDown()?'Yes':'No'" ></span>		 		
+						</div>											
+						<div class="ffl col-md-4 detail" >vFrac Skimming</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: vFracSkimming()?'Yes':'No'"></span>				 		
+						</div>
+						<div class="ffl col-md-4 detail" >vFinal Wash</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: vFinalWash()?'Yes':'No'" ></span>				 		
+						</div>
+						<div class="ffl col-md-4 detail" >vBlinding</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: vBlinding()?'Yes':'No'" ></span>				 		
+						</div>
+						<div class="ffl col-md-4 detail" >vDegas</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: vDegas()?'Yes':'No'" ></span>				 		
+						</div>						
+						<div class="ffl col-md-4 detail" >vPontoon Cleaning</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span  data-bind="text: vPontoonCleaning()?'Yes':'No'"></span>			 		
+						</div>
+						<div class="ffl col-md-4 detail" >vSeal Cleaning</div>
+					 	<div class="ffl col-md-2 detail" style="font-weight:bold;">
+					 		<span data-bind="text: vSealCleaning()?'Yes':'No'" ></span>				 		
+						</div>
+						<div class="col-md-12" style="padding-top:10px;">
+							Created on &nbsp;<span data-bind="text: createdDate"></span> by &nbsp; {!userName}							
+						</div>
+					</div>
+					<div class="col-md-6">											
+						<div class="col-md-12" >
+							<h4>Notes</h4>				
+							<span style="width:100%;height: 200px; border:1px solid #FFF; overflow:auto;" data-bind="text: notes" maxlength="3000"  rows="6" class="form-control" id=""></span>
+						</div>
+						<div class="col-md-12" style="float:left;padding-top:22px;">
+							<h4>Estimates</h4>							
+							<div class="ffl col-md-6 outputs detail" >Equipment</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">
+						 		<span  style="width:100%" data-bind="currency :equipmentOutput, symbol: '$'" ></span>						 		
+						 	</div>
+						 	<div class="ffl col-md-6 outputs detail">Materials</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">
+						 		<span  style="width:100%" data-bind="currency :materialsOutput, symbol: '$'" ></span>
+						 		<!-- span style="width:100%" data-bind="text : materialsOutput" ></span-->
+						 	</div>
+						 	<div class="ffl col-md-6 outputs detail">Labor</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">
+						 		<span  style="width:100%" data-bind="currency :laborOutput, symbol: '$'" ></span>
+						 		<!-- span style="width:100%" data-bind="text : laborOutput"></span-->
+						 	</div>
+						 	<div class="ffl col-md-6  outputs detail">Rescue</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">
+						 		<span style="width:100%" data-bind="currency :rescueOutput, symbol: '$'" ></span>
+						 		<!-- span style="width:100%" data-bind="text : rescueOutput" ></span-->
+						 	</div>
+						 	<div class="ffl col-md-6 outputs detail">Per Diem</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">
+						 		<span style="width:100%" data-bind="currency :perDiemOutput, symbol: '$'" ></span>
+						 		<!-- span style="width:100%" data-bind="text : perDiemOutput" ></span-->
+						 	</div>
+						 	<div class="ffl col-md-6  outputs detail">Rescue Per Diem</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">
+						 		<span  style="width:100%" data-bind="currency :rescuePerDiemOutput, symbol: '$'" ></span>
+						 		<!-- span style="width:100%" data-bind="text : rescuePerDiemOutput" ></span-->
+						 	</div>												 	
+						 	<div class="ffl col-md-6 outputs detail" >Lump Sum</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">
+						 		<span  style="width:100%" data-bind="currency :lumpSumOutput, symbol: '$'" ></span>
+						 		<!-- span style="width:100%" data-bind="text : lumpSumOutput"></span-->
+						 	</div>	
+						 	<div class="ffl col-md-6  outputs detail">Total Inches Remain</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">						 		
+						 		<span  data-bind="text : totalInchesRemainOutput" ></span>
+						 	</div>	
+						 	<div class="ffl col-md-6  outputs detail">Total Barrels</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">
+						 		<span style="width:100%" data-bind="text : totalBarrelsOutput" ></span>
+						 	</div>						
+							<div class="ffl col-md-6 outputs detail">Status</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">						 		
+						 		<span style="width:100%" data-bind="text : status" ></span>
+						 	</div>
+						 	<div class="ffl col-md-6 outputs detail">Tank #</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">						 		
+						 		<span style="width:100%" data-bind="text : tankNumber" ></span>
+						 	</div>
+						 	<div class="ffl col-md-6  outputs detail" >Estimated Start Date</div>
+						 	<div class="ffl col-md-6 detail" style="font-weight:bold;">
+						 		<span style="width:100%" data-bind="text : estimatedStartDate" ></span>
+						 		<!-- apex:outputtext value="{!jobDate}"   styleClass="form-control" /-->
+						 		<!-- apex:outputtext value="{0,date,dd.MM.yyyy}" ><apex:param value="{!jobDate}"/></apex:outputtext-->
+						 		<!-- apex:outputtext value="{0,date,MMMM dd,yyyy}" ><apex:param value="{!jobDate}"/></apex:outputtext-->
+						 	</div>				 																
+						</div>
+						<div class="col-md-12" style="text-align:center;padding-top:25px;" >
+							<!-- input type="submit" value="Edit Quote" class="btn btn-primary btn-lg" /-->
+							<!-- input id="enterPo" type="submit" value="Create Job" class="btn btn-primary btn-lg" data-bind="click: openEnterPO"/-->											
+						</div>
+						<div class="col-md-12" data-bind="fadeVisible: enterPOSection">
+							<div class="ffl col-md-4 detail" style="padding-top:20px;">Enter PO#</div>
+					 		<div class="ffc col-md-4 detail" style="padding-top:15px;">
+					 			<input type="text" class="form-control" style="width:100%" data-bind="value : poNumber, valueUpdate: 'afterkeydown'" placeholder="Enter PO Number" />					 			
+					 		</div>
+					 		<div class="ffc col-md-4 detail" style="padding-top:10px;">
+					 			<input type="submit" value="Create Job" class="btn btn-primary btn-lg" data-bind="click: createJob"/>
+					 			<apex:form >
+					 			 <apex:actionFunction name="afterSubmitMsg" action="{!goToMain}"  />
+					 			 </apex:form>
+									<script>
+									function afterSubmit(){
+										alert('Job Created');
+										afterSubmitMsg();
+									}								
+								</script>
+					 		</div>
+						</div>
+					</div>
+				</div>			
+		</div>
+	</div><!-- end container -->
+</div>			 	
+	<apex:includeScript value="{!URLFOR($Resource.static, 'js/1.js')}" />
+    
+<!-- a class="scroll-to-top" href="#" id="scrollToTop"><i class="icon icon-chevron-up icon-white"></i></a-->	
+</apex:component>
