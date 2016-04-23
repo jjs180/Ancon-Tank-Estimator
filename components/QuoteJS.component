@@ -1,0 +1,477 @@
+<apex:component controller="QuoteController">
+	<script>
+		j$ = jQuery.noConflict();
+		ko.bindingHandlers.fadeVisible = {
+		    init: function(element, valueAccessor) {
+		        // Initially set the element to be instantly visible/hidden depending on the value
+		        var value = valueAccessor();
+		        j$(element).toggle(ko.unwrap(value)); // Use "unwrapObservable" so we can handle values that may or may not be observable
+		    },
+		    update: function(element, valueAccessor) {
+		        // Whenever the value subsequently changes, slowly fade the element in or out
+		        var value = valueAccessor();
+		        ko.unwrap(value) ? j$(element).fadeIn() : j$(element).fadeOut();
+		    }
+		};
+		ko.bindingHandlers.currency = {
+		    symbol: ko.observable('$'),
+		    update: function(element, valueAccessor, allBindingsAccessor){
+		    return ko.bindingHandlers.text.update(element,function(){
+		        var value = +(ko.utils.unwrapObservable(valueAccessor()) || 0),
+		        symbol = ko.utils.unwrapObservable(allBindingsAccessor().symbol === undefined
+		                ? allBindingsAccessor().symbol
+		                : ko.bindingHandlers.currency.symbol);
+		        return symbol + value.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+		    });
+		    }
+		};
+		
+		function formatCurrency(value) {
+		    return "$" + value.toFixed(2);
+		}
+		
+		function QuoteVM(){						
+			var self=this;
+			//var contactId = "{!$CurrentPage.parameters.cid}";
+			var contactId = "{!contactId}";
+			console.log('contactId====' + contactId);
+			self.jobTypeChoices = ko.observableArray(['Refined', 'Crude']);
+			self.jobType = ko.observable();
+			self.tankDetails = ko.observable();
+			self.crudeTool = ko.observable();
+			self.refineTool = ko.observable();
+			self.outputs = ko.observable();
+			self.productChoices = ko.observableArray([]);
+			self.locationChoices = ko.observableArray([]);
+			self.vacTruckChoices = ko.observableArray(['0', '1','2','3','4']);
+			self.jobType.subscribe(function(newValue){
+				if(newValue == 'Refined'){
+					self.crudeTool(false);
+					self.tankDetails(true);
+					self.refineTool(true);	
+					self.outputs(true);
+					self.productChoices(['Gasoline', 'Naptha', 'Diesel']);	
+					self.locationChoices(['Berth 121','Carson','Carson Crude','Colton','East Hynes','Golden Eagle','LB Terminal','San Diego','Terminal 2','Terminal 3','Tesoro LARW','West Hynes','Wilmington']);										
+				}
+				else if(newValue == 'Crude'){
+					self.crudeTool(true);
+					self.tankDetails(true);
+					self.refineTool(false);
+					self.outputs(true);
+					self.productChoices(['Crude', 'Residual', 'Heavy Parafin', 'Slop', 'Waste Water']);
+					self.locationChoices(['Anacortis','Berth 121','Boise','Carson','Carson Crude','Colton','East Hynes','Golden Eagle','LB Terminal','Pasco','Salt Lake City','San Diego','Stockton','Terminal 2','Terminal 3','Tesoro LARW','Vancouver WA','West Hynes','Wilmington']);								
+				}
+				else{	
+					self.crudeTool(false);
+					self.refineTool(false);
+					self.tankDetails(false);
+					self.outputs(false);
+				}
+			}); 
+			self.quoteId=ko.observable();
+			self.status=ko.observable();
+			self.createdDate=ko.observable();
+			self.estimatedStartDate=ko.observable();
+			self.calculateQuoteSection = ko.observable(true);
+			self.submitQuoteButton = ko.observable();
+			self.quoteDetailSection = ko.observable();
+			//Input Fields
+			self.company=ko.observable();
+			self.companyChoices=ko.observableArray(['Ancon', 'Tesoro Refineries', 'Tesoro Logistics', 'Chevron']);
+			self.tankDiameter=ko.observable(0);
+			self.hoursPerShift=ko.observable();
+			
+			self.hoursPerShiftChoices=ko.observableArray(['8', '10', '12']);
+			self.location=ko.observable();
+			self.locationChoices=ko.observableArray(['Anacortis','Berth 121','Boise','Carson','Carson Crude','Colton','East Hynes','Golden Eagle','LB Terminal','Pasco','Salt Lake City','San Diego','Stockton','Terminal 2','Terminal 3','Tesoro LARW','Vancouver WA','West Hynes','Wilmington']);
+			self.pontoonType=ko.observable();
+			self.pontoonChoices=ko.observableArray(['Fixed','Ring','Full Deck']);
+			self.cleanPontoon=ko.observable(false);
+			self.vacumTrucks=ko.observable(0);
+			self.truckSize=ko.observable(0);
+			self.truckSizeChoices=ko.observableArray(['70', '120']);
+			self.drainMethod=ko.observable();
+			self.drainMethodChoices=ko.observableArray(['Pipeline', 'FracTank', 'Vacum Truck']);
+			self.product=ko.observable();
+			self.degasSupportOutput=ko.observable();						
+			self.productAbove5Ft=ko.observable('');
+			self.productAbove5FtChoices=ko.observableArray(['Liquid', 'Solid']);
+			self.remainingFt=ko.observable(0);
+			self.remainingIn=ko.observable(0);
+			self.scale=ko.observable();
+			self.scaleChoices=ko.observableArray(['15', '30', '45', '60', 'Coated', 'No Scale']);
+			self.washType=ko.observable();
+			self.washTypeChoices=ko.observableArray(['Cold', 'Hot']);
+			self.roofAccess=ko.observable(false);
+			self.entryCleaningRequired=ko.observable(false);
+			self.treatmentNeeded=ko.observable(false);
+			self.removeSeal=ko.observable(false);
+			self.cleanSeal=ko.observable(false);
+			self.rescueTeam=ko.observable('None');
+			self.rescueTeamChoices=ko.observableArray(['None', '2 Man Team', '3 Man Team']);
+			self.setLegs=ko.observable(false);
+			self.cribbing=ko.observable(false);
+			self.degasSupport=ko.observable(false);						
+			self.degasSupportHours=ko.observable(0);
+			self.fracTanks=ko.observable(false);
+			self.fracTanksNeeded=ko.observable(0);
+			self.vacuumTruckSupport=ko.observable(false);
+			self.vFracDrainDown=ko.observable(false);
+			self.vFracSkimming=ko.observable(false);
+			self.vFinalWash=ko.observable(false);
+			self.vBlinding=ko.observable(false);
+			self.vDegas=ko.observable(false);
+			self.vEntrySludgeRemoval=ko.observable(false);
+			self.vSealCleaning=ko.observable(false);
+			self.vPontoonCleaning=ko.observable(false);
+			self.lcoDieselPickup=ko.observable();
+			self.notes=ko.observable('');
+			self.editMode = ko.observable(false);
+			self.tankNumber = ko.observable('');
+			self.isEdit=ko.observable(true);
+			self.editQuote = function(){
+				self.isEdit(true);
+			}
+			
+			self.submitQuoteSection = ko.observable();
+			self.createQuoteButton = ko.observable();
+			self.enterPOSection = ko.observable();
+			self.openSubmitQuoteSection=function(){
+					self.submitQuoteSection(!self.submitQuoteSection());				
+			}
+			//Output fields
+			self.quoteNumber=ko.observable();
+			self.equipmentOutput=ko.observable();
+			self.materialsOutput=ko.observable();
+			self.laborOutput=ko.observable();
+			self.rescueOutput=ko.observable();
+			self.perDiemOutput=ko.observable();
+			self.rescuePerDiemOutput=ko.observable();
+			self.lumpSumOutput=ko.observable();
+			self.totalInchesRemainOutput=ko.observable();
+			self.totalBarrelsOutput=ko.observable();
+			
+			self.calculateQuote=function(){					
+				var quoteId = self.quoteId();
+				self.isEdit(false);
+					
+					
+				/*console.log('company====' +self.company());
+				console.log('tankdiameter===='+self.tankDiameter());
+				console.log('hourspershift===='+self.hoursPerShift());
+				console.log('location===='+self.location());
+				console.log('pontoontype===='+	self.pontoonType());
+				console.log('cleanpontoon====='+self.cleanPontoon());
+				console.log('vacumtrucks========'+self.vacumTrucks());
+				console.log('trucksize======'+self.truckSize());
+				console.log('drainmethod========'+self.drainMethod());
+				console.log('product======'+self.product());
+				console.log('productAbove5f========'+self.productAbove5Ft());
+				console.log('remainingft========='+	self.remainingFt());
+				console.log('remainingIn====='+	self.remainingIn());
+				console.log('roofaccess====='+	self.roofAccess());
+				console.log('entrycleaningrequired======'+self.entryCleaningRequired());
+				console.log('treatmentneeded===='+self.treatmentNeeded());
+				console.log('removeseal===='+			self.removeSeal());
+				console.log('cleanseal====='+		self.cleanSeal());
+				console.log('rescueteam======'+		self.rescueTeam());
+				console.log('setlegs====='+		self.setLegs());
+				console.log('cribbing====='+		self.cribbing());
+				console.log('degassupport====='+		self.degasSupport());						
+				console.log('degassupporthours====='+		self.degasSupportHours());
+				console.log('fractanks===='	+	self.fracTanks());
+				console.log('fraktanksneeded====='	+	self.fracTanksNeeded());
+				console.log('vactrucksupport===='+		self.vacuumTruckSupport());
+				console.log('vfracdraindown===='+		self.vFracDrainDown());
+				console.log('vfracskimming======'+		self.vFracSkimming());
+				console.log('vfinalwash====='+self.vFinalWash());
+				console.log('vblinding======'+self.vBlinding());
+				console.log('vdegas====='+self.vDegas());
+				console.log('ventrysludgeremove====='+self.vEntrySludgeRemoval());
+				console.log('vsealcleaning======='+self.vSealCleaning());
+				console.log('vpontooncleaning==========='+self.vPontoonCleaning());
+				console.log('notes===='+self.notes());*/	
+				console.log('jobtype======' + self.jobType());
+				var job_Type = self.jobType();
+				if(job_Type == 'Refined'){
+					console.log('refined jobtype')
+					var quoteDetails = {															
+						company : self.company(),			
+						tankDiameter : self.tankDiameter(),
+						hoursPerShift : self.hoursPerShift(),			
+						location : self.location(),
+						pontoonType : self.pontoonType(),								
+						vacumTrucks : self.vacumTrucks(),
+						truckSize : self.truckSize(),			
+						drainMethod : self.drainMethod(),			
+						product : self.product(),			
+						remainingIn : self.remainingIn(),
+						scales : self.scale(),
+						washType : self.washType(),
+						estimatedStartDate : (j$('#estimatedStartDate_alternate').val()),			
+						rescueTeam : self.rescueTeam(),														
+						degasSupportHours : self.degasSupportHours(),					
+						notes : self.notes(),
+						tankNumber : self.tankNumber(),
+						status : self.status(),
+						jobType : self.jobType()
+					}
+					var quoteDetails2 = {
+						cleanPontoon : self.cleanPontoon(),
+						setLegs : self.setLegs(),
+						cribbing : self.cribbing(),
+						degasSupport : self.degasSupport(),	
+					}
+					var editModeBool = self.editMode();
+					console.log('editModeBool defined====' + editModeBool);
+					if(editModeBool == false){
+						//console.log('editMode===' + self.editMode());
+						//console.log('in not edit mode editModeBool===' + editModeBool);
+						//console.log('status====' + self.status());
+						 Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.QuoteController.calculateQuote}',contactId,quoteDetails, quoteDetails2,
+						 	function(result){
+								//console.log('quoteCalculated');
+								//console.log('result.id------------' + result.Id);
+								self.quoteId(result.Id);							
+								console.log('total equipment==========' + result.Equipment_Hourly__c);	
+								console.log('total materials=============' + result.Materials_Job__c);													
+								self.equipmentOutput(result.Equipment_Hourly__c);
+								self.materialsOutput(result.Materials_Job__c);
+								self.rescueOutput(result.Rescue_Billing__c);								
+								self.laborOutput(result.Total_Labor_Billing__c);
+								self.degasSupportOutput(result.Degas_Support_Refined__c);
+								console.log('degas support refined=======' + result.Degas_Support_Refined__c);
+																
+								self.perDiemOutput(result.Total_Tech_PerDiem__c);
+								self.rescuePerDiemOutput(result.Rescue_PerDiem_Refined__c);
+								self.lumpSumOutput(result.Lump_Sum_Total__c);
+								self.totalInchesRemainOutput(result.Total_Inches_Remain__c);
+								self.totalBarrelsOutput(result.Total_Barrels__c);
+								
+								
+								self.quoteNumber(result.Name);
+								if(result.CreatedDate != null){
+					    			var dob = normalizeDate(result.CreatedDate);
+						    		//var dobAlt = normalizeDate2(result.CreatedDate);
+						    		self.createdDate(dob);
+						    		//document.getElementById('studentDOB_alternate').value = dobAlt;
+						    	}
+																
+								//self.createdDate(result.CreatedDate);
+								self.editMode(true);
+								self.createQuoteButton(true);
+								//self.createQuote(true);
+								//console.log('editMode===' + self.editMode());
+								//alert('self.quoteId 1===============' + self.quoteId());				
+							},{escape:true});
+					}
+					else{
+						//console.log('edit');
+						//console.log('editMode===' + self.editMode());
+						//console.log('in not edit mode editModeBool===' + editModeBool);	
+						//console.log('status====' + self.status());
+						//console.log('tank number===' + self.tankNumber());
+						var quoteId = self.quoteId();
+						var status = self.status();
+						var tankNumber = self.tankNumber();
+						console.log('quoteId====' + quoteId + 'self.quoteid====' + self.quoteId());				
+						 Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.QuoteController.editQuote}',quoteId, status, tankNumber, quoteDetails, quoteDetails2,
+						 	function(result){
+								console.log('quoteCalculated');
+								console.log('result.id------------' + result.Id);							
+								//self.quoteId(result.Id);
+								console.log('total equipment==========' + result.Total_Equipment_Billing__c);														
+								self.equipmentOutput(result.Total_Equipment_Billing__c);
+								self.materialsOutput(result.Total_Materials_Billing__c);
+								self.laborOutput(result.Total_Labor_Billing__c);
+								self.rescueOutput(result.Rescue_Billing__c);
+								self.perDiemOutput(result.Total_Tech_PerDiem__c);
+								self.rescuePerDiemOutput(result.Rescue_PerDiem__c);
+								self.lumpSumOutput(result.Lump_Sum_Total__c);
+								self.totalInchesRemainOutput(result.Total_Inches_Remain__c);
+								self.totalBarrelsOutput(result.Total_Barrels__c);
+								self.quoteId(result.Id);
+								//self.editMode(true);
+								console.log('editMode===' + self.editMode());
+								//alert('self.quoteId 1===============' + self.quoteId());				
+							},{escape:true});					
+					}
+																
+				}
+				if(job_Type == 'Crude'){
+					console.log('crude jobtype');
+					var quoteDetails = {															
+						company : self.company(),			
+						tankDiameter : self.tankDiameter(),
+						hoursPerShift : self.hoursPerShift(),			
+						location : self.location(),
+						pontoonType : self.pontoonType(),								
+						vacumTrucks : self.vacumTrucks(),
+						truckSize : self.truckSize(),			
+						drainMethod : self.drainMethod(),			
+						product : self.product(),			
+						productAbove5ft : self.productAbove5Ft(),			
+						remainingFt : self.remainingFt(),
+						remainingIn : self.remainingIn(),
+						estimatedStartDate : (j$('#estimatedStartDate_alternate').val()),
+						//scale : self.scale(),			
+						//washType : self.washType(),			
+						rescueTeam : self.rescueTeam(),														
+						degasSupportHours : self.degasSupportHours(),					
+						fracTanksNeeded : self.fracTanksNeeded(),										
+						lcoDieselPickup : self.lcoDieselPickup(),
+						notes : self.notes(),
+						tankNumber : self.tankNumber(),
+						status : self.status(),
+						jobType : self.jobType()
+					}
+					var quoteDetails2 = {
+						cleanPontoon : self.cleanPontoon(),
+						vacuumTruckSupport : self.vacuumTruckSupport(),
+						vFracDrainDown : self.vFracDrainDown(),
+						vFracSkimming : self.vFracSkimming(),
+						vPontoonCleaning : self.vPontoonCleaning(),
+						vFinalWash : self.vFinalWash(),
+						vBlinding : self.vBlinding(),
+						vDegas : self.vDegas(),
+						vEntrySludgeRemoval : self.vEntrySludgeRemoval(),
+						vSealCleaning : self.vSealCleaning(),
+						setLegs : self.setLegs(),
+						cribbing : self.cribbing(),
+						degasSupport : self.degasSupport(),
+						roofAccess : self.roofAccess(),
+						entryCleaningRequired : self.entryCleaningRequired(),
+						treatmentNeeded : self.treatmentNeeded(),
+						removeSeal : self.removeSeal(),
+						cleanSeal : self.cleanSeal(),
+						fracTanks : self.fracTanks()
+					}
+					//console.log('self.roofaccess===========' + self.roofAccess() + 'self.');
+					//debugger;
+					//Visualforce.remoting.timeout = 120000;
+					var editModeBool = self.editMode();
+					console.log('editModeBool defined====' + editModeBool);
+					if(editModeBool == false){
+						console.log('editMode===' + self.editMode());
+						console.log('in not edit mode editModeBool===' + editModeBool);
+						console.log('status====' + self.status());
+						 Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.QuoteController.calculateQuote}',contactId,quoteDetails, quoteDetails2,
+						 	function(result){
+								console.log('quoteCalculated');
+								console.log('result.id------------' + result.Id);
+								self.quoteId(result.Id);							
+								console.log('total equipment==========' + result.Total_Equipment_Billing__c);														
+								self.equipmentOutput(result.Total_Equipment_Billing__c);
+								self.materialsOutput(result.Total_Materials_Billing__c);
+								self.laborOutput(result.Total_Labor_Billing__c);
+								self.rescueOutput(result.Rescue_Billing__c);
+								self.perDiemOutput(result.Total_Tech_PerDiem__c);
+								self.rescuePerDiemOutput(result.Rescue_PerDiem__c);
+								self.lumpSumOutput(result.Lump_Sum_Total__c);
+								self.totalInchesRemainOutput(result.Total_Inches_Remain__c);
+								self.totalBarrelsOutput(result.Total_Barrels__c);
+								self.quoteNumber(result.Name);
+								if(result.CreatedDate != null){
+					    			var dob = normalizeDate(result.CreatedDate);
+						    		//var dobAlt = normalizeDate2(result.CreatedDate);
+						    		self.createdDate(dob);
+						    		//document.getElementById('studentDOB_alternate').value = dobAlt;
+						    	}
+																
+								//self.createdDate(result.CreatedDate);
+								self.editMode(true);
+								self.createQuoteButton(true);
+								//self.createQuote(true);
+								console.log('editMode===' + self.editMode());
+								//alert('self.quoteId 1===============' + self.quoteId());				
+							},{escape:true});
+					}
+					else{
+						console.log('edit');
+						console.log('editMode===' + self.editMode());
+						console.log('in not edit mode editModeBool===' + editModeBool);	
+						console.log('status====' + self.status());
+						console.log('tank number===' + self.tankNumber());
+						var quoteId = self.quoteId();
+						var status = self.status();
+						var tankNumber = self.tankNumber();
+						console.log('quoteId====' + quoteId + 'self.quoteid====' + self.quoteId());				
+						 Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.QuoteController.editQuote}',quoteId, status, tankNumber, quoteDetails, quoteDetails2,
+						 	function(result){
+								console.log('quoteCalculated');
+								console.log('result.id------------' + result.Id);							
+								//self.quoteId(result.Id);
+								console.log('total equipment==========' + result.Total_Equipment_Billing__c);														
+								self.equipmentOutput(result.Total_Equipment_Billing__c);
+								self.materialsOutput(result.Total_Materials_Billing__c);
+								self.laborOutput(result.Total_Labor_Billing__c);
+								self.rescueOutput(result.Rescue_Billing__c);
+								self.perDiemOutput(result.Total_Tech_PerDiem__c);
+								self.rescuePerDiemOutput(result.Rescue_PerDiem__c);
+								self.lumpSumOutput(result.Lump_Sum_Total__c);
+								self.totalInchesRemainOutput(result.Total_Inches_Remain__c);
+								self.totalBarrelsOutput(result.Total_Barrels__c);
+								self.quoteId(result.Id);
+								//self.editMode(true);
+								console.log('editMode===' + self.editMode());
+								//alert('self.quoteId 1===============' + self.quoteId());				
+							},{escape:true});					
+					}
+				}							
+			}
+			self.submitQuote = function(){
+				self.status('Quoted');
+				tankNumber = self.tankNumber();
+				console.log('tanknumber===' + tankNumber + 'quoteId====' + self.quoteId());
+				console.log('in submit  edit mode='+ self.editMode());
+				console.log('estimated start date=====' + self.estimatedStartDate());
+				//console.log('estimated start date==' + document.getElementById('estimatedStartDate').value());
+				//console.log('jobdate=====' + {!jobDate});
+				self.calculateQuote();
+				self.quoteDetailSection(true);
+				self.calculateQuoteSection(false);
+			}
+			self.poNumber = ko.observable();
+			self.openEnterPO = function(){
+				self.enterPOSection(!self.enterPOSection());
+				if (self.enterPOSection()){
+					document.getElementById('enterPo').value='Cancel Create Job';
+				}
+				else{
+					document.getElementById('enterPo').value='Create Job';
+				}
+			}
+			self.poId = ko.observable();
+			self.createJob = function(){
+				var quoteId = self.quoteId();
+				console.log('quoteid=====' + quoteId);
+				var poNumber = self.poNumber();
+				Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.QuoteController.createPurchaseOrder}',quoteId,
+					function(result){
+						console.log('po submitted');
+						self.poNumber(result.Name);
+						self.poId(result.Id);
+						console.log('ponumber=====' + self.poNumber() + '  poId=======' + self.poId());						
+					},{escape:true});
+				//location.window('/main?cid=' + contactId);
+				afterSubmit();
+			}
+			
+	
+		}//end viewmodel
+					
+		var Quote=new QuoteVM;
+		ko.applyBindings(Quote);
+	</script>
+	<script>
+		function normalizeDate(dateVal){ 
+			mydate = new Date(dateVal);
+		    data = new Date(mydate -  mydate.getTimezoneOffset() * 60000);
+		    var d = mydate.getDate()+1;
+		    var m = mydate.getMonth()+1;
+		    var y = mydate.getFullYear();
+		    return (m<=9?'0'+m:m) +'-' + (d<=9?'0'+d:d)+'-' + y;		
+		}
+	</script>
+	
+</apex:component>
