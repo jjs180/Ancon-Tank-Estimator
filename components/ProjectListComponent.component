@@ -1,0 +1,41 @@
+<apex:component controller="QuoteController" allowDML="true">
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+		    <apex:form >
+		        <c:ProjectTableComponent targetPbTableIds="pbt"  pageSizeOptions="5,10,15,30" defaultPageSize="10" enableExport="true"/>
+		        <apex:pageBlock mode="maindetail" id="pb">                     
+		           <apex:pageblocksection title="Project Tracker" columns="1" collapsible="false">
+		               <apex:pageblockTable value="{!projects}" var="p" id="pbt" styleClass="table-striped">
+		                    <apex:column headerValue="Customer" value="{!p.Account__r.Name}" style="width:150px;"/>
+                            <apex:column headerValue="PO#" style="width:120px;">
+                           		<apex:outputLink value="/editproject?id={!p.Id}">{!p.PO__c}</apex:outputLink>
+                            </apex:column>
+		                    <apex:column value="{!p.Quote__c}"  style="width:76px;"/>
+		                    <apex:column headerValue="Tank" value="{!p.Tank__c}" style="width:60px;"/>
+		                    <apex:column value="{!p.Location__c}" style="width:119px;"/>
+		                    <apex:column value="{!p.PO_Amount__c}" style="width:112px;"/>
+		                    <apex:column headerValue="PO Days" value="{!p.Days__c}" style="width:78px;text-align:center;"/>		                    
+		                    <apex:column value="{!p.Actual_Days__c}" style="width:111px;text-align:center;"/>		                    
+		                    <apex:column value="{!p.Change_Order__c}" style="width:111px;"/>
+		                    <apex:column style="width:60px;">
+		                    	<!-- a href="">Edit</a-->
+                               <apex:outputLink value="/editproject?id={!p.Id}"><i style="font-size:20px;" class="icon icon-edit"></i></apex:outputLink>
+                               <apex:outputLink ><i style="font-size:20px;" class="icon icon-trash-o"></i></apex:outputLink> 
+                                <!--
+		                    	<apex:commandLink action="{!editProject}">Edit
+		                    		<apex:param name="selectedProject" value="{!p.id}" assignTo="{!selectedProject}"/>
+		                    	</apex:commandLink>
+								-->
+		                    </apex:column>
+		                </apex:pageblockTable>
+		            </apex:pageblocksection>
+		            <!-- apex:pageBlockButtons >
+		                <apex:commandButton value="Rerender" oncomplete="initPageBlockTableEnhancerADV();" rerender="pb"/>
+		            </apex:pageBlockButtons-->
+		        </apex:pageBlock>
+		    </apex:form>
+	    </div>
+    </div>
+</div>
+</apex:component>

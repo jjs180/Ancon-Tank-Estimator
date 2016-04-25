@@ -15,10 +15,11 @@ public class QuoteController {
     public static User currentUser{get;set;}
     public string selectedProject{get;set;}
     
+    public Id quoteSFId{get;set;}
     
     
     public QuoteController (){            
-       	//quoteId = ApexPages.currentPage().getParameters().get('qId');
+       	quoteSFId = ApexPages.currentPage().getParameters().get('qId');
        	userId = UserInfo.getUserId() ;
       
         currentUser  = [SELECT id, firstName, lastName, Account.Name, ContactId, AccountId FROM User WHERE Id =: userId];
@@ -40,10 +41,10 @@ public class QuoteController {
     	//estimatedStartDate = jobDate;                 
     }
     public List<Quote_RE__c> getQuotes(){
-    	return [SELECT Id, Name, Tank__c,Status__c,PO__c,Account__c,Location__c, Lump_Sum_Total__c,Purchase_Order_RE__c,Days__c FROM Quote_RE__c WHERE Account__c =: companyId ];
+    	return [SELECT Id, Name, Tank__c,Status__c,PO__c,Account__c, Account__r.Name, Location__c, Lump_Sum_Total__c,Purchase_Order_RE__c,Days__c FROM Quote_RE__c WHERE Account__c =: companyId ];
     }
     public List<Project__c> getProjects(){
-    	return [SELECT Id, Name, Tank__c, Location__c,Days__c,Actual_Days__c,Change_Order__c,Account__c, PO_Amount__c, Quote__c,PO__c FROM Project__c WHERE Account__c =: companyId];
+    	return [SELECT Id, Name, Tank__c, Location__c,Days__c,Actual_Days__c,Change_Order__c,Account__c,Account__r.Name, PO_Amount__c, Quote__c,PO__c FROM Project__c WHERE Account__c =: companyId];
     }
     public List<Quote_RE__c> getAcceptedQuotes(){
     	return [SELECT Id, Name, Tank__c,Status__c,PO__c,Account__c,Location__c, Lump_Sum_Total__c,Purchase_Order_RE__c,Days__c FROM Quote_RE__c WHERE Account__c =: companyId AND Status__c =: 'Accepted'];

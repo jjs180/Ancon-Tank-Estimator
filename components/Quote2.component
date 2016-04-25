@@ -26,40 +26,40 @@
                 	
 					<div class="ffl col-md-4">Tank Diameter (ft)</div>
 					<div class="ffc col-md-2" >
-						<input id="" type="text" class="form-control" style="width:100%" data-bind="value : tankDiameter, valueUpdate: 'afterkeydown', enable: isEdit" placeholder="Diameter" tabindex="2"/>
+						<input id="" type="text" required="true" class="form-control" style="width:100%" data-bind="value : tankDiameter, valueUpdate: 'afterkeydown', enable: isEdit" placeholder="Diameter" tabindex="2"/>
 					</div>												
 					<div class="ffl col-md-3"><a class="tooltips" >Hours per Shift<span>For straight time overtime and shift count.</span></a></div>
 					<div class="ffc col-md-3" >
-						<select class="form-control" style=" width:100%;" tabindex="2" data-bind='options: hoursPerShiftChoices, optionsCaption: "Select", value: hoursPerShift, valueUpdate :"afterkeydown",enable: isEdit'></select>
+						<select class="form-control" style=" width:100%;" tabindex="2" data-bind='options: hoursPerShiftChoices, value: hoursPerShift, valueUpdate :"afterkeydown",enable: isEdit'></select>
 				 	</div>								
 					<div class="ffl col-md-6">Location</div>
 					<div class="ffc col-md-6">
-						<select id="" class="form-control" style=" width:100%;" tabindex="3" data-bind='options: locationChoices, optionsCaption: "Select", value: location, valueUpdate: "afterkeydown",enable: isEdit'></select>
+						<select id="" class="form-control" style=" width:100%;" tabindex="3" data-bind='options: locationChoices, value: location, valueUpdate: "afterkeydown",enable: isEdit'></select>
 					</div>								
 					<div class="ffl col-md-4">Pontoon Type</div>
 				 	<div class="ffc col-md-3">
-				 		<select id="" class="form-control" style="width:100%;" tabindex="4" data-bind='options: pontoonChoices, optionsCaption: "Select", value: pontoonType, valueUpdate: "afterkeydown",enable: isEdit'></select>										
+				 		<select id="" class="form-control" style="width:100%;" tabindex="4" data-bind='options: pontoonChoices, value: pontoonType, valueUpdate: "afterkeydown",enable: isEdit'></select>										
 					</div>						 
 					<div class="ffl col-md-4"><a class="tooltips" >Clean Pontoon<span>No means take pontoon cleaning our out.</span></a></div>
 				 	<div class="ffc col-md-1" style="text-align:center;">
-				 		<input type="checkbox" data-bind="checked: cleanPontoon" tabindex="5"/>				 																				 		
+				 		<input type="checkbox" data-bind="checked: cleanPontoon, enable: isEdit" tabindex="5"/>				 																				 		
 					</div>								 
 					 <div class="ffl col-md-6" style="clear:both;">Vacum Trucks</div>
 					 <div class="ffc col-md-6" >
-					 	<select id="" class="form-control" style="width:100% " tabindex="6" data-bind='options: vacTruckChoices, optionsCaption: "Select", value: vacumTrucks, valueUpdate: "afterkeydown",enable: isEdit'></select>
+					 	<select id="" class="form-control" style="width:100% " tabindex="6" data-bind='options: vacTruckChoices, value: vacumTrucks, valueUpdate: "afterkeydown",enable: isEdit'></select>
 					 	<!-- input id="" type="text" class="form-control" style="width:100%" data-bind="value : vacumTrucks, valueUpdate: 'afterkeydown',enable: isEdit" placeholder="Vacum Trucks" tabindex="6"/-->				 																		 								 		
 					</div>								
 					<div class="ffl col-md-6" style="clear:both;">Truck Size</div>
 				 	<div class="ffc col-md-6">
-				 		<select id="" class="form-control" style="width:100% " tabindex="7" data-bind='options: truckSizeChoices, optionsCaption: "Select", value: truckSize, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 								 		
+				 		<select id="" class="form-control" style="width:100% " tabindex="7" data-bind='options: truckSizeChoices, value: truckSize, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 								 		
 					</div>								
 					<div class="ffl col-md-6" style="clear:both;">Drain Method</div>
 				 	<div class="ffc col-md-6">
-				 		<select id="" class="form-control" style="width:100% " tabindex="8" data-bind='options: drainMethodChoices, optionsCaption: "Select", value: drainMethod, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 									 		
+				 		<select id="" class="form-control" style="width:100% " tabindex="8" data-bind='options: drainMethodChoices, value: drainMethod, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 									 		
 					</div>								
 					<div class="ffl col-md-6">Product</div>
 				 	<div class="ffc col-md-6">
-				 		<select id="" class="form-control" style="width:100% " tabindex="9" data-bind='options: productChoices, optionsCaption: "Select", value: product, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 		
+				 		<select id="" class="form-control" style="width:100% " tabindex="9" data-bind='options: productChoices, value: product, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 		
 					</div>
 					<div data-bind="visible: crudeTool()">
 						<div class="ffl col-md-6">Product Above 5 Ft.</div>
@@ -82,19 +82,19 @@
 					<div data-bind="visible: !crudeTool()">
 						<div class="ffl col-md-6" style="clear:both;">Barrels Scale</div>
 					 	<div class="ffc col-md-6">
-					 		<select id="" class="form-control" style="width:100% " tabindex="8" data-bind='options: scaleChoices, optionsCaption: "Select", value: scale, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 									 		
+					 		<select id="" class="form-control" style="width:100% " tabindex="8" data-bind='options: scaleChoices, value: scale, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 									 		
 						</div>	
 					</div>
 					<div data-bind="visible: !crudeTool()">
 						<div class="ffl col-md-6" style="clear:both;">Wash Type</div>
 					 	<div class="ffc col-md-6">
-					 		<select id="" class="form-control" style="width:100% " tabindex="8" data-bind='options: washTypeChoices, optionsCaption: "Select", value: washType, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 									 		
+					 		<select id="" class="form-control" style="width:100% " tabindex="8" data-bind='options: washTypeChoices, value: washType, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 									 		
 						</div>	
 					</div>
 					<div>		
 					 	<div class="ffl col-md-6" style="clear:both;"><a class="tooltips" >Rescue Team<span>Ancon provides dedicated rescue team for the project.</span></a></div>
 					 	<div class="ffc col-md-6">
-					 		<select id="" class="form-control" style="width:100% " tabindex="16" data-bind='options: rescueTeamChoices, optionsCaption: "Select", value: rescueTeam, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 										 		
+					 		<select id="" class="form-control" style="width:100% " tabindex="16" data-bind='options: rescueTeamChoices, value: rescueTeam, valueUpdate: "afterkeydown",enable: isEdit'></select>																		 										 		
 						</div>
 					</div>
 					<div data-bind="visible: crudeTool()">		

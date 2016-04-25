@@ -78,7 +78,7 @@
 			//Input Fields
 			self.company=ko.observable();
 			self.companyChoices=ko.observableArray(['Ancon', 'Tesoro Refineries', 'Tesoro Logistics', 'Chevron']);
-			self.tankDiameter=ko.observable(0);
+			self.tankDiameter=ko.observable(100);
 			self.hoursPerShift=ko.observable();
 			
 			self.hoursPerShiftChoices=ko.observableArray(['8', '10', '12']);
@@ -87,18 +87,18 @@
 			self.pontoonType=ko.observable();
 			self.pontoonChoices=ko.observableArray(['Fixed','Ring','Full Deck']);
 			self.cleanPontoon=ko.observable(false);
-			self.vacumTrucks=ko.observable(0);
+			self.vacumTrucks=ko.observable(1);
 			self.truckSize=ko.observable(0);
 			self.truckSizeChoices=ko.observableArray(['70', '120']);
 			self.drainMethod=ko.observable();
 			self.drainMethodChoices=ko.observableArray(['Pipeline', 'FracTank', 'Vacum Truck']);
-			self.product=ko.observable();
+			self.product=ko.observable('Gasoline');
 			self.degasSupportOutput=ko.observable();						
 			self.productAbove5Ft=ko.observable('');
 			self.productAbove5FtChoices=ko.observableArray(['Liquid', 'Solid']);
 			self.remainingFt=ko.observable(0);
 			self.remainingIn=ko.observable(0);
-			self.scale=ko.observable();
+			self.scale=ko.observable('No Scale');
 			self.scaleChoices=ko.observableArray(['15', '30', '45', '60', 'Coated', 'No Scale']);
 			self.washType=ko.observable();
 			self.washTypeChoices=ko.observableArray(['Cold', 'Hot']);

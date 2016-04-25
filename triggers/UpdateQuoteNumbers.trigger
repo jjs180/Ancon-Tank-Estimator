@@ -275,11 +275,16 @@ trigger UpdateQuoteNumbers on Quote_RE__c (before insert, before update) {
             quote.Steamer_Tank__c = refinedReference.STEM__C;
             quote.Techs__c = refinedReference.TECHS__c + quote.HotWash_Crew__c + quote.Vacum_Trucks__c + quote.BottleWash_Crew__c;
             quote.Vac_Truck_Hours_Refined__c = refinedReference.WASH__C + quote.DeMob_Hours__c;
+            
+            //formula value of Rescue_Billing__c and Rescue_Techs__c not available during before insert context
+            integer rescueTechs = 0;
             if(quote.Rescue_Team__c == '2 Man Team'){
                 quote.Rescue_PerDiem_Refined__c = 2 * quote.PerDiem__c * quote.Fresh_Air_Shifts__c;
+                rescueTechs=2;
             }
             else if(quote.Rescue_Team__c == '3 Man Team'){
                 quote.Rescue_PerDiem_Refined__c = 3 * quote.PerDiem__c * quote.Fresh_Air_Shifts__c;
+                rescueTechs=3;
             }
             else{
                 quote.Rescue_PerDiem_Refined__c = 0;
@@ -289,12 +294,20 @@ trigger UpdateQuoteNumbers on Quote_RE__c (before insert, before update) {
                 quote.Degas_Support_Refined__c = quote.Degas_Support_Hours__c * dgRateData.Hourly__c;
                 system.debug('dgrate ========================           ' + dgRateData.Hourly__c + '    degas support refined=========' + quote.Degas_Support_Refined__c);
             }
-            system.debug('Total Equipment billing====' + quote.Total_Equipment_Billing__c);
-            system.debug('Total Equipment billing====' + quote.Total_Equipment_Billing__c);
-            system.debug('Total Equipment billing====' + quote.Total_Equipment_Billing__c);
-            system.debug('Total Equipment billing====' + quote.Total_Equipment_Billing__c);
-            quote.Lump_Sum_Total__c = quote.Total_Equipment_Billing__c +  quote.Total_Materials_Billing__c +  quote.Total_Labor_Billing__c +  quote.Rescue_Billing__c + quote.Total_Tech_PerDiem__c +  quote.Rescue_PerDiem__c;
+            system.debug('Total Refined Equipment Hourly====' + quote.Equipment_Hourly__c);
+            system.debug('Total Refined Materials Job====' + quote.Materials_Job__c);
+            system.debug('Total Refined Labor====' + quote.Refined_Labor__c);
+            //system.debug('Total Refined Rescue billing====' + quote.Rescue_Billing__c);
+            system.debug('Total Tech PerDiem====' + quote.Total_Tech_PerDiem__c);
+            system.debug('Total Rescue PerDiem====' + quote.Rescue_PerDiem__c);
+            //quote.Lump_Sum_Total__c = quote.Total_Equipment_Billing__c +  quote.Total_Materials_Billing__c +  quote.Total_Labor_Billing__c +  quote.Rescue_Billing__c + quote.Total_Tech_PerDiem__c +  quote.Rescue_PerDiem__c;
             
+
+            double rescueRefinedAmount = rescueTechs * quote.BottleWash_Hours__c * quote.Rescue_Rate_Refined__c;  //Rescue_Hours_Refined__c is just BottleWash_Hours__c
+            system.debug('Total Refined Calculated RescueAmount====' + rescueRefinedAmount);
+
+            quote.Lump_Sum_Total__c = quote.Equipment_Hourly__c +  quote.Materials_Job__c +  quote.Refined_Labor__c + rescueRefinedAmount + quote.Total_Tech_PerDiem__c +  quote.Rescue_PerDiem__c + quote.Degas_Support_Refined__c;
+            system.debug('Refined Total Lump sum====' + quote.Lump_Sum_Total__c);   
         }
     }
     /*}

@@ -1,4 +1,16 @@
 <apex:component controller="QuoteController">
+<style>
+.icon {
+    display: inline-block;
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}       
+</style>
+
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -7,14 +19,20 @@
                 <apex:pageBlock mode="maindetail" id="pb">                     
                    <apex:pageblocksection title="Quotes" columns="1" collapsible="false" id="tableTitle">
                        <apex:pageblockTable value="{!quotes}" var="q" id="pbt" styleClass="table-striped">
-                            <apex:column headerValue="Customer" value="{!q.Account__c}" style="width:223px;"/>
-                            <apex:column headerValue="Quote#" value="{!q.Name}" style="width:117px;"/>
-                            <apex:column value="{!q.PO__c}" style="width:100px;"/>                          
-                            <apex:column value="{!q.Tank__c}" style="width:88px;"/>
+                            <apex:column headerValue="Customer" value="{!q.Account__r.Name}" style="width:150px;"/>
+                            <apex:column headerValue="Quote#" style="width:120px;">
+                            	<apex:outputLink value="/tank_estimator?qId={!q.Id}">{!q.Name}</apex:outputLink>
+                            </apex:column>
+                            <apex:column value="{!q.PO__c}" style="width:90px;"/>                          
+                            <apex:column value="{!q.Tank__c}" style="width:90px;"/>
                             <apex:column value="{!q.Location__c}" style="width:180px;"/>
-                            <apex:column headerValue="Amount" value="{!q.Lump_Sum_Total__c}" style="width:152px;"/>
-                            <apex:column value="{!q.Days__c}" style="width:74px;"/>
-                            <apex:column value="{!q.Status__c}" style="width:124px;"/>
+                            <apex:column headerValue="Amount" value="{!q.Lump_Sum_Total__c}" style="width:120px;"/>
+                            <apex:column value="{!q.Days__c}" style="width:80px;"/>
+                            <apex:column value="{!q.Status__c}" style="width:90px;"/>
+                            <apex:column style="width: 60px;">
+                            <apex:outputLink value="/tank_estimator?qId={!q.Id}"><i style="font-size:20px;" class="icon icon-edit"></i></apex:outputLink>
+                            <apex:outputLink ><i style="font-size:20px;" class="icon icon-trash-o"></i></apex:outputLink>
+                            </apex:column>
                         </apex:pageblockTable>
                     </apex:pageblocksection>
                     <!-- apex:pageBlockButtons >
