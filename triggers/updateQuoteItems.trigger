@@ -4,6 +4,10 @@ trigger updateQuoteItems on Quote_RE__c (after update) {
              //system.debug('************************************************* Is First time?====' + RecursiveTriggerHandler.isFirstTimeUpdated);
              RecursiveTriggerHandler.isFirstTimeUpdated = false;
              for(Quote_RE__c quote : Trigger.new){
+                Map<string, FX5__Price_Book_Item__c> list_PriceBookItems = new Map<string, FX5__Price_Book_Item__c>();
+                for(FX5__Price_Book_Item__c pBI: [SELECT FX5__Catalog_Item_Code__c, id, Hourly__c, Hourly_Cost__c, Standard_Time__c,Over_Time__c,Standard_Time_Cost__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c]){
+                    list_PriceBookItems.put(pBI.FX5__Catalog_Item_Code__c, pBI);
+                }
                 if(quote.Job_Type__c == 'Crude'){
                     Decimal tankDiameter = quote.Tank_Diameter__c;
                     LIST<Quote_Line_Item__c> quoteLineItem = ([SELECT id, Name__c, Quote__c FROM Quote_Line_Item__c WHERE Quote__c =: quote.id ]);
@@ -12,59 +16,60 @@ trigger updateQuoteItems on Quote_RE__c (after update) {
                     REFERENCE__c middleReference = ([SELECT id, AHOSE__c,BAGS__c,BLINDING__c,CATEGORY__c,CBLOCK__c,CLEAN__c,CLEANUP_EO__c,CLEANUP_FOREMEN__c,CLEANUP_LABOR__c,CLEANUP_SUP__c,CLEANUP_TECHS__c,CP20__c,CRIBBING_EO__c,CRIBBING_FOREMEN__c,CRIBBING_LABOR__c,CRIBBING_SUP__c,CRIBCREW__c,CRIBHOURS__c,DE__c,DECK__c,DS__c,FIXED__c,FLANGEHOSE__c,FLIGHT__c,FRESH__c,GASMETER__c,GLOVES__c,GROUND__c,H2S__c,HORN__c,HOTGM__c,JETPUMP__c,LVS__c,M15__c,M30__c,MINS__c,PLASTIC__c,PLUGS__c,POOL__c,PW__c,PWFCLEAN__c,PWHOSE__c,RAGS__c,RESP__c,RG__c,RIGDOWN__c,RIGUP__c,RING__c,RMC__c,SCANON__c,SEALREMOVE__c,SEALWASH__c,SETLEGS__c,SIGS__c,SUPTRUCK__c,TANKSWEEP__c,TAPE__c,TLIGHT__c,TRASHPUMP__c,TRUCK__c,TYPE__c,TYVEK__c,VACHOSE__c,WATER__c,WHOSE__c,X185AC__c,X375AC__c FROM REFERENCE__c WHERE (DS__c <=: TankDiameter AND DE__c >=: TankDiameter) AND (TYPE__c =: 'MID')]);
                     REFERENCE__c topReference = ([SELECT id, AHOSE__c,BAGS__c,BLINDING__c,CATEGORY__c,CBLOCK__c,CLEAN__c,CLEANUP_EO__c,CLEANUP_FOREMEN__c,CLEANUP_LABOR__c,CLEANUP_SUP__c,CLEANUP_TECHS__c,CP20__c,CRIBBING_EO__c,CRIBBING_FOREMEN__c,CRIBBING_LABOR__c,CRIBBING_SUP__c,CRIBCREW__c,CRIBHOURS__c,DE__c,DECK__c,DS__c,FIXED__c,FLANGEHOSE__c,FLIGHT__c,FRESH__c,GASMETER__c,GLOVES__c,GROUND__c,H2S__c,HORN__c,HOTGM__c,JETPUMP__c,LVS__c,M15__c,M30__c,MINS__c,PLASTIC__c,PLUGS__c,POOL__c,PW__c,PWFCLEAN__c,PWHOSE__c,RAGS__c,RESP__c,RG__c,RIGDOWN__c,RIGUP__c,RING__c,RMC__c,SCANON__c,SEALREMOVE__c,SEALWASH__c,SETLEGS__c,SIGS__c,SUPTRUCK__c,TANKSWEEP__c,TAPE__c,TLIGHT__c,TRASHPUMP__c,TRUCK__c,TYPE__c,TYVEK__c,VACHOSE__c,WATER__c,WHOSE__c,X185AC__c,X375AC__c FROM REFERENCE__c WHERE (DS__c <=: TankDiameter AND DE__c >=: TankDiameter) AND (TYPE__c =: 'TOP')]);         
 //Equipment data
-                    FX5__Price_Book_Item__c tankSweepData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'ANCN_180_8IN']);       
-                    FX5__Price_Book_Item__c sigsData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'SLDG_INJ_GLND']);             
-                    FX5__Price_Book_Item__c pWasherData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '2.5K_PRSS_WSHR_3GPM']);        
-                    FX5__Price_Book_Item__c pWaterHoseData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'HGH_PRSS_DSCHRG_HSE_50']);                
-                    FX5__Price_Book_Item__c minsData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'MNWY_INJ_NZZL']);                
-                    FX5__Price_Book_Item__c rmcData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'MNWY_CN_RMT']);        
-                    FX5__Price_Book_Item__c lvsData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'LVS_DGAS_SYSTM']);        
-                    FX5__Price_Book_Item__c trashPumpData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '6_TRSH_PMP']);               
-                    FX5__Price_Book_Item__c jetPumpData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'JT_PMP']);        
-                    FX5__Price_Book_Item__c flangeHoseData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '4_FLNG_HSE_HMMR_UNN_25']);        
-                    FX5__Price_Book_Item__c truckData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'CRW_CB']);       
-                    FX5__Price_Book_Item__c supTruckData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'PCKUP_TRCK']);        
-                    FX5__Price_Book_Item__c one85AcData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '185_AIR_CMP']);        
-                    FX5__Price_Book_Item__c three75AcData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '375_AIR_CMP']);        
-                    FX5__Price_Book_Item__c hotGMData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '4GAS_MTR_MNTR']);        
-                    FX5__Price_Book_Item__c freshAirData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'FRSH_AIR_SETUP_4MSK']);        
-                    FX5__Price_Book_Item__c airHoseData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'AIR_HSE_50']);        
-                    FX5__Price_Book_Item__c groundCableData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'GRND_CBL']);        
-                    FX5__Price_Book_Item__c gasMeterData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '4GAS_MTR_MNTR']);               
-                    FX5__Price_Book_Item__c vacHoseData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'VAC_HSE']);        
-                    FX5__Price_Book_Item__c waterHoseData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'WTR_HSE_50']);        
-                    FX5__Price_Book_Item__c cp20Data = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'CP20_CPPS_BLWR']);        
-                    FX5__Price_Book_Item__c tankLightData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'LRG_TNK_LGHT_EP']);        
-                    FX5__Price_Book_Item__c flashLightData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'FLSHLGHT_EXP_PRF']);       
-                    FX5__Price_Book_Item__c persH2sData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'PERS_H2S_MTR_MNTR']);        
-                    FX5__Price_Book_Item__c m15Data = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'M15_PMP']);        
-                    FX5__Price_Book_Item__c m30Data = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'M30_PMP']);        
-                    FX5__Price_Book_Item__c sidewayCannonData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'MNWAY_CN_SD']);       
-                    FX5__Price_Book_Item__c vacumTrucksData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '120BBL_VAC_TRCK']);       
-                    FX5__Price_Book_Item__c vacTruckGasMeterData = ([SELECT id, FX5__Catalog_Item_Code__c, Hourly__c, Hourly_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '4GAS_MTR_MNTR']);               
+                                      
+                    FX5__Price_Book_Item__c tankSweepData = list_PriceBookItems.get('ANCN_180_8IN');
+                    FX5__Price_Book_Item__c sigsData = list_PriceBookItems.get('SLDG_INJ_GLND');             
+                    FX5__Price_Book_Item__c pWasherData = list_PriceBookItems.get('2.5K_PRSS_WSHR_3GPM');        
+                    FX5__Price_Book_Item__c pWaterHoseData = list_PriceBookItems.get('HGH_PRSS_DSCHRG_HSE_50');                
+                    FX5__Price_Book_Item__c minsData = list_PriceBookItems.get('MNWY_INJ_NZZL');                
+                    FX5__Price_Book_Item__c rmcData = list_PriceBookItems.get('MNWY_CN_RMT');        
+                    FX5__Price_Book_Item__c lvsData = list_PriceBookItems.get('LVS_DGAS_SYSTM');        
+                    FX5__Price_Book_Item__c trashPumpData = list_PriceBookItems.get('6_TRSH_PMP');               
+                    FX5__Price_Book_Item__c jetPumpData = list_PriceBookItems.get('JT_PMP');        
+                    FX5__Price_Book_Item__c flangeHoseData = list_PriceBookItems.get('4_FLNG_HSE_HMMR_UNN_25');        
+                    FX5__Price_Book_Item__c truckData = list_PriceBookItems.get('CRW_CB');       
+                    FX5__Price_Book_Item__c supTruckData = list_PriceBookItems.get('PCKUP_TRCK');        
+                    FX5__Price_Book_Item__c one85AcData = list_PriceBookItems.get('185_AIR_CMP');        
+                    FX5__Price_Book_Item__c three75AcData = list_PriceBookItems.get('375_AIR_CMP');        
+                    FX5__Price_Book_Item__c hotGMData = list_PriceBookItems.get('4GAS_MTR_MNTR');        
+                    FX5__Price_Book_Item__c freshAirData = list_PriceBookItems.get('FRSH_AIR_SETUP_4MSK');        
+                    FX5__Price_Book_Item__c airHoseData = list_PriceBookItems.get('AIR_HSE_50');        
+                    FX5__Price_Book_Item__c groundCableData = list_PriceBookItems.get('GRND_CBL');        
+                    FX5__Price_Book_Item__c gasMeterData = list_PriceBookItems.get('4GAS_MTR_MNTR');               
+                    FX5__Price_Book_Item__c vacHoseData = list_PriceBookItems.get('VAC_HSE');        
+                    FX5__Price_Book_Item__c waterHoseData = list_PriceBookItems.get('WTR_HSE_50');        
+                    FX5__Price_Book_Item__c cp20Data = list_PriceBookItems.get('CP20_CPPS_BLWR');        
+                    FX5__Price_Book_Item__c tankLightData = list_PriceBookItems.get('LRG_TNK_LGHT_EP');        
+                    FX5__Price_Book_Item__c flashLightData = list_PriceBookItems.get('FLSHLGHT_EXP_PRF');       
+                    FX5__Price_Book_Item__c persH2sData = list_PriceBookItems.get('PERS_H2S_MTR_MNTR');        
+                    FX5__Price_Book_Item__c m15Data = list_PriceBookItems.get('M15_PMP');        
+                    FX5__Price_Book_Item__c m30Data = list_PriceBookItems.get('M30_PMP');        
+                    FX5__Price_Book_Item__c sidewayCannonData = list_PriceBookItems.get('MNWAY_CN_SD');       
+                    FX5__Price_Book_Item__c vacumTrucksData = list_PriceBookItems.get('120BBL_VAC_TRCK');       
+                    FX5__Price_Book_Item__c vacTruckGasMeterData = list_PriceBookItems.get('4GAS_MTR_MNTR');               
 //Cleaning Labor data
-                    FX5__Price_Book_Item__c superVData = ([SELECT id, FX5__Catalog_Item_Code__c, Standard_Time__c,Over_Time__c,Standard_Time_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'SPVSR']);        
-                    FX5__Price_Book_Item__c foremenData = ([SELECT id, FX5__Catalog_Item_Code__c, Standard_Time__c,Over_Time__c,Standard_Time_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'FOREMAN']);        
-                    FX5__Price_Book_Item__c equipmentOpData = ([SELECT id, FX5__Catalog_Item_Code__c, Standard_Time__c,Over_Time__c,Standard_Time_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'EQUP_OPER']);        
-                    FX5__Price_Book_Item__c laborData = ([SELECT id, FX5__Catalog_Item_Code__c, Standard_Time__c,Over_Time__c,Standard_Time_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'LBR_TECH']);        
-                    FX5__Price_Book_Item__c driverData = ([SELECT id, FX5__Catalog_Item_Code__c, Standard_Time__c,Over_Time__c,Standard_Time_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'CL_A_DRV']);                                        
+                    FX5__Price_Book_Item__c superVData = list_PriceBookItems.get('SPVSR');        
+                    FX5__Price_Book_Item__c foremenData = list_PriceBookItems.get('FOREMAN');        
+                    FX5__Price_Book_Item__c equipmentOpData = list_PriceBookItems.get('EQUP_OPER');        
+                    FX5__Price_Book_Item__c laborData = list_PriceBookItems.get('LBR_TECH');        
+                    FX5__Price_Book_Item__c driverData = list_PriceBookItems.get('CL_A_DRV');                                        
 //Materials data
-                    FX5__Price_Book_Item__c tyvekData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'TYVEK']);        
-                    FX5__Price_Book_Item__c plasticData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '20_VSQN_PLSTC_RLL_100']);        
-                    FX5__Price_Book_Item__c respData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'RESP_FLL_FAC']);        
-                    FX5__Price_Book_Item__c glovesData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'PVC_GLV']);        
-                    FX5__Price_Book_Item__c PlugsData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'EAR_PLG_FM']);        
-                    FX5__Price_Book_Item__c waterData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'DRNK_WTR']);        
-                    FX5__Price_Book_Item__c poolData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'DCN_LG_POOL']);        
-                    FX5__Price_Book_Item__c bagsData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'PLSTC_BG_30X40']);        
-                    FX5__Price_Book_Item__c cleanData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'HND_CLNR']);       
-                    FX5__Price_Book_Item__c tapeData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'DUCT_TAPE']);        
-                    FX5__Price_Book_Item__c hornData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'PRTBL_AIR_HRN']);        
-                    FX5__Price_Book_Item__c ragsData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'RAGS_BX']);        
-                    FX5__Price_Book_Item__c rgData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'RN_GR_FRC']);        
-                    FX5__Price_Book_Item__c cblockData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'CRIB_BLCKS']);       
-                    FX5__Price_Book_Item__c respCartData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'RESP_RPLC_CART']);       
-                    FX5__Price_Book_Item__c vtruckWashData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c, FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'HT_WTR_WSHOUT']);
+                    FX5__Price_Book_Item__c tyvekData = list_PriceBookItems.get('TYVEK');        
+                    FX5__Price_Book_Item__c plasticData = list_PriceBookItems.get('20_VSQN_PLSTC_RLL_100');        
+                    FX5__Price_Book_Item__c respData = list_PriceBookItems.get('RESP_FLL_FAC');        
+                    FX5__Price_Book_Item__c glovesData = list_PriceBookItems.get('PVC_GLV');        
+                    FX5__Price_Book_Item__c PlugsData = list_PriceBookItems.get('EAR_PLG_FM');        
+                    FX5__Price_Book_Item__c waterData = list_PriceBookItems.get('DRNK_WTR');        
+                    FX5__Price_Book_Item__c poolData = list_PriceBookItems.get('DCN_LG_POOL');        
+                    FX5__Price_Book_Item__c bagsData = list_PriceBookItems.get('PLSTC_BG_30X40');        
+                    FX5__Price_Book_Item__c cleanData = list_PriceBookItems.get('HND_CLNR');       
+                    FX5__Price_Book_Item__c tapeData = list_PriceBookItems.get('DUCT_TAPE');        
+                    FX5__Price_Book_Item__c hornData = list_PriceBookItems.get('PRTBL_AIR_HRN');        
+                    FX5__Price_Book_Item__c ragsData = list_PriceBookItems.get('RAGS_BX');        
+                    FX5__Price_Book_Item__c rgData = list_PriceBookItems.get('RN_GR_FRC');        
+                    FX5__Price_Book_Item__c cblockData = list_PriceBookItems.get('CRIB_BLCKS');       
+                    FX5__Price_Book_Item__c respCartData = list_PriceBookItems.get('RESP_RPLC_CART');       
+                    FX5__Price_Book_Item__c vtruckWashData = list_PriceBookItems.get('HT_WTR_WSHOUT');
 
                     For ( Quote_Line_Item__c qli : quoteLineItem){
                             //system.debug('2  *********************************************************base drain hours=' + quote.Base_Drain_Hours__c + 'non-drain hours=== ' + quote.Non_Drain_Hours__c);
@@ -1108,44 +1113,44 @@ trigger updateQuoteItems on Quote_RE__c (after update) {
                         SETLEGS__C,CRIBHOURS__C,CRIBTOWERS__C FROM REFERENCE__c WHERE (DS__c <=: TankDiameter AND DE__c >=: TankDiameter) AND (TYPE__c =: 'Refined')]);
                     LOCATION__c location = ([SELECT id, Name, BOTTLEWASH__C, FRESHAIR_REFINED__C, GasMeter_Loc__c, M30__c, MOB_HOURS__C, WASH__C, HOLEWATCH__C, GASMETERQTY__C, PERDIEM__c, TRAVELTIME__c, FRESHAIR__c, GASMETERS__c FROM LOCATION__c WHERE Name =: locationEntered]);           
 //Equipment data                    
-                    FX5__Price_Book_Item__c gamaJetData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'GAMA_JET']);       
-                    FX5__Price_Book_Item__c cartData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'RESP_RPLC_CART']);             
-                    FX5__Price_Book_Item__c hotPWasherData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '2.5K_PRSS_WSHR_3GPM']);        
-                    FX5__Price_Book_Item__c jetPumpData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'JT_PMP']);        
-                    FX5__Price_Book_Item__c gearTruckData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'CRW_CB']);       
-                    FX5__Price_Book_Item__c one85AcData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '185_AIR_CMP']);        
-                    FX5__Price_Book_Item__c three75AcData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '375_AIR_CMP']);        
-                    FX5__Price_Book_Item__c freshAirData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'FRSH_AIR_SETUP_4MSK']);        
-                    FX5__Price_Book_Item__c airHoseData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'AIR_HSE_50']);        
-                    FX5__Price_Book_Item__c groundCableData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'GRND_CBL']);        
-                    FX5__Price_Book_Item__c gasMeterData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '4GAS_MTR_MNTR']);               
-                    FX5__Price_Book_Item__c vacHoseData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '4_CMLCK_VAC_HSE_20']);        
-                    FX5__Price_Book_Item__c waterHoseData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'WTR_HSE_50']);        
-                    FX5__Price_Book_Item__c cp20Data = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'CP20_CPPS_BLWR']);        
-                    FX5__Price_Book_Item__c tankLightData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'LRG_TNK_LGHT_EP']);        
-                    FX5__Price_Book_Item__c flashLightData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'FLSHLGHT_EXP_PRF']);       
-                    FX5__Price_Book_Item__c persH2sData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'PERS_H2S_MTR_MNTR']);        
-                    FX5__Price_Book_Item__c m15Data = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'M15_PMP']);        
-                    FX5__Price_Book_Item__c m30Data = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'M30_PMP']);        
-                    FX5__Price_Book_Item__c vacumTrucksData = ([SELECT id, FX5__Catalog_Item_Code__c,Hourly_Cost__c, Hourly__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '120BBL_VAC_TRCK']);       
+                    FX5__Price_Book_Item__c gamaJetData = list_PriceBookItems.get('GAMA_JET');       
+                    FX5__Price_Book_Item__c cartData = list_PriceBookItems.get('RESP_RPLC_CART');             
+                    FX5__Price_Book_Item__c hotPWasherData = list_PriceBookItems.get('2.5K_PRSS_WSHR_3GPM');        
+                    FX5__Price_Book_Item__c jetPumpData = list_PriceBookItems.get('JT_PMP');        
+                    FX5__Price_Book_Item__c gearTruckData = list_PriceBookItems.get('CRW_CB');       
+                    FX5__Price_Book_Item__c one85AcData = list_PriceBookItems.get('185_AIR_CMP');        
+                    FX5__Price_Book_Item__c three75AcData = list_PriceBookItems.get('375_AIR_CMP');        
+                    FX5__Price_Book_Item__c freshAirData = list_PriceBookItems.get('FRSH_AIR_SETUP_4MSK');        
+                    FX5__Price_Book_Item__c airHoseData = list_PriceBookItems.get('AIR_HSE_50');        
+                    FX5__Price_Book_Item__c groundCableData = list_PriceBookItems.get('GRND_CBL');        
+                    FX5__Price_Book_Item__c gasMeterData = list_PriceBookItems.get('4GAS_MTR_MNTR');               
+                    FX5__Price_Book_Item__c vacHoseData = list_PriceBookItems.get('4_CMLCK_VAC_HSE_20');        
+                    FX5__Price_Book_Item__c waterHoseData = list_PriceBookItems.get('WTR_HSE_50');        
+                    FX5__Price_Book_Item__c cp20Data = list_PriceBookItems.get('CP20_CPPS_BLWR');        
+                    FX5__Price_Book_Item__c tankLightData = list_PriceBookItems.get('LRG_TNK_LGHT_EP');        
+                    FX5__Price_Book_Item__c flashLightData = list_PriceBookItems.get('FLSHLGHT_EXP_PRF');       
+                    FX5__Price_Book_Item__c persH2sData = list_PriceBookItems.get('PERS_H2S_MTR_MNTR');        
+                    FX5__Price_Book_Item__c m15Data = list_PriceBookItems.get('M15_PMP');        
+                    FX5__Price_Book_Item__c m30Data = list_PriceBookItems.get('M30_PMP');        
+                    FX5__Price_Book_Item__c vacumTrucksData = list_PriceBookItems.get('120BBL_VAC_TRCK');       
 //Materials data
-                    FX5__Price_Book_Item__c tyvekData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'TYVEK']);        
-                    FX5__Price_Book_Item__c plasticData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '20_VSQN_PLSTC_RLL_100']);        
-                    FX5__Price_Book_Item__c respData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: '1/2_RESP_FAC']);        
-                    FX5__Price_Book_Item__c glovesData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'PVC_GLV']);        
-                    FX5__Price_Book_Item__c earPlugsData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'EAR_PLG_FM']);        
-                    FX5__Price_Book_Item__c waterData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'DRNK_WTR']);        
-                    FX5__Price_Book_Item__c poolData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'DCN_LG_POOL']);        
-                    FX5__Price_Book_Item__c bagsData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'PLSTC_BG_30X40']);        
-                    FX5__Price_Book_Item__c cleanData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'HND_CLNR']);       
-                    FX5__Price_Book_Item__c tapeData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'DUCT_TAPE']);        
-                    FX5__Price_Book_Item__c hornData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'PRTBL_AIR_HRN']);        
-                    FX5__Price_Book_Item__c cblockData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'CRIB_BLCKS']);       
-                    FX5__Price_Book_Item__c respCartData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'RESP_RPLC_CART']);       
-                    FX5__Price_Book_Item__c vtruckWashData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'HT_WTR_WSHOUT']);
-                    FX5__Price_Book_Item__c rgData = ([SELECT id, FX5__Catalog_Item_Code__c, FX5__Price__c,FX5__Catalog_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'RN_GR_FRC']);        
+                    FX5__Price_Book_Item__c tyvekData = list_PriceBookItems.get('TYVEK');        
+                    FX5__Price_Book_Item__c plasticData = list_PriceBookItems.get('20_VSQN_PLSTC_RLL_100');        
+                    FX5__Price_Book_Item__c respData = list_PriceBookItems.get('1/2_RESP_FAC');        
+                    FX5__Price_Book_Item__c glovesData = list_PriceBookItems.get('PVC_GLV');        
+                    FX5__Price_Book_Item__c earPlugsData = list_PriceBookItems.get('EAR_PLG_FM');        
+                    FX5__Price_Book_Item__c waterData = list_PriceBookItems.get('DRNK_WTR');        
+                    FX5__Price_Book_Item__c poolData = list_PriceBookItems.get('DCN_LG_POOL');        
+                    FX5__Price_Book_Item__c bagsData = list_PriceBookItems.get('PLSTC_BG_30X40');        
+                    FX5__Price_Book_Item__c cleanData = list_PriceBookItems.get('HND_CLNR');       
+                    FX5__Price_Book_Item__c tapeData = list_PriceBookItems.get('DUCT_TAPE');        
+                    FX5__Price_Book_Item__c hornData = list_PriceBookItems.get('PRTBL_AIR_HRN');        
+                    FX5__Price_Book_Item__c cblockData = list_PriceBookItems.get('CRIB_BLCKS');       
+                    FX5__Price_Book_Item__c respCartData = list_PriceBookItems.get('RESP_RPLC_CART');       
+                    FX5__Price_Book_Item__c vtruckWashData = list_PriceBookItems.get('HT_WTR_WSHOUT');
+                    FX5__Price_Book_Item__c rgData = list_PriceBookItems.get('RN_GR_FRC');        
 //Labor data
-                    FX5__Price_Book_Item__c mrateData = ([SELECT id, Hourly__c, Hourly_Cost__c,Over_Time__c,Standard_Time__c, Standard_Time_Cost__c,Over_Time_Cost__c FROM FX5__Price_Book_Item__c WHERE FX5__Price_Book__c =: quote.Price_Book__c AND FX5__Catalog_Item_Code__c =: 'mrate']);
+                    FX5__Price_Book_Item__c mrateData = list_PriceBookItems.get('mrate');
                                         
                     For ( Quote_Line_Item__c qli : quoteLineItem){
                     //equipment calculations
@@ -1483,54 +1488,59 @@ trigger updateQuoteItems on Quote_RE__c (after update) {
                         }
                     }
                     update quoteLineItem;
+                    
+                    Map<String, Quote_Line_Item__c> mapQuoteLineItems = new Map<String, Quote_Line_Item__c>();
+                    for(Quote_Line_Item__c qli: [SELECT id,Name, Ext__c, PPE__c,Total__c, Name__c,B_QTY__c,Quote__c, Per_Shift__c,CP__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId]){
+                        mapQuoteLineItems.put(qli.Name__c, qli);
+                    }
                     //materials
-                    Quote_Line_Item__c rainGear = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Rain Gear'];
-                    Quote_Line_Item__c plastic = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Plastic'];
-                    Quote_Line_Item__c resp = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Respirators'];
-                    Quote_Line_Item__c gloves = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Gloves'];
-                    Quote_Line_Item__c earPlugs = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Ear Plugs'];
-                    Quote_Line_Item__c water = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Water'];
-                    Quote_Line_Item__c pool = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Kitty Pools'];
-                    Quote_Line_Item__c bags = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Plastic Bags'];
-                    Quote_Line_Item__c clean = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Hand Cleaner'];
-                    Quote_Line_Item__c tape = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Duct Tape'];
-                    Quote_Line_Item__c horn = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Air Horn'];
-                    Quote_Line_Item__c respCart = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Respirator Cart'];
-                    Quote_Line_Item__c cblock = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Cribbing Blocks'];
-                    Quote_Line_Item__c vtruckWash = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Vac Truck Wash'];
-                    Quote_Line_Item__c tyvek = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Tyvek'];
+                    Quote_Line_Item__c rainGear = mapQuoteLineItems.get('Rain Gear');
+                    Quote_Line_Item__c plastic = mapQuoteLineItems.get('Plastic');
+                    Quote_Line_Item__c resp = mapQuoteLineItems.get('Respirators');
+                    Quote_Line_Item__c gloves = mapQuoteLineItems.get('Gloves');
+                    Quote_Line_Item__c earPlugs = mapQuoteLineItems.get('Ear Plugs');
+                    Quote_Line_Item__c water = mapQuoteLineItems.get('Water');
+                    Quote_Line_Item__c pool = mapQuoteLineItems.get('Kitty Pools');
+                    Quote_Line_Item__c bags = mapQuoteLineItems.get('Plastic Bags');
+                    Quote_Line_Item__c clean = mapQuoteLineItems.get('Hand Cleaner');
+                    Quote_Line_Item__c tape = mapQuoteLineItems.get('Duct Tape');
+                    Quote_Line_Item__c horn = mapQuoteLineItems.get('Air Horn');
+                    Quote_Line_Item__c respCart = mapQuoteLineItems.get('Respirator Cart');
+                    Quote_Line_Item__c cblock = mapQuoteLineItems.get('Cribbing Blocks');
+                    Quote_Line_Item__c vtruckWash = mapQuoteLineItems.get('Vac Truck Wash');
+                    Quote_Line_Item__c tyvek = mapQuoteLineItems.get('Tyvek');
                     //equipment
-                    Quote_Line_Item__c gearTrucks = [SELECT id,Name__c, Ext__c, PPE__c,B_QTY__c,Quote__c, Per_Shift__c,CP__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Gear Trucks'];   
-                    Quote_Line_Item__c one85Ac = [SELECT  id,Name__c, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: '185 Air Compressor'];
-                    Quote_Line_Item__c three85Ac = [SELECT  id,Name__c, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: '375 Air Compressor'];
-                    Quote_Line_Item__c gasMeter = [SELECT id,Name__c, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Gas Meter'];
-                    Quote_Line_Item__c cp20 = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'CP-20'];
-                    Quote_Line_Item__c persH2s = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Personell H2s'];
-                    Quote_Line_Item__c m15 = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'M-15s'];
-                    Quote_Line_Item__c groundCable = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Ground Cable'];
-                    Quote_Line_Item__c vacHose = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Vac Hoses'];
-                    Quote_Line_Item__c waterHose = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Water Hoses'];
-                    Quote_Line_Item__c jetPump = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Jet Pump'];
-                    Quote_Line_Item__c gamaJet = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Gama Jet'];
-                    Quote_Line_Item__c M30 = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'M30'];
-                    Quote_Line_Item__c flashLight = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Flash Lights'];
-                    Quote_Line_Item__c tankLight = [SELECT id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Tank Lights'];
-                    Quote_Line_Item__c vacumTrucks = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Vacuum Trucks'];
-                    Quote_Line_Item__c freshAir = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Fresh Air'];
-                    Quote_Line_Item__c airHose = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Air Hose'];
-                    Quote_Line_Item__c hotPWasher = [SELECT  id,Name, Ext__c, PPE__c,B_QTY__c, Per_Shift__c,CP__c  FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Hot Pressure Washer'];
+                    Quote_Line_Item__c gearTrucks = mapQuoteLineItems.get('Gear Trucks');   
+                    Quote_Line_Item__c one85Ac = mapQuoteLineItems.get('185 Air Compressor');
+                    Quote_Line_Item__c three85Ac = mapQuoteLineItems.get('375 Air Compressor');
+                    Quote_Line_Item__c gasMeter = mapQuoteLineItems.get('Gas Meter');
+                    Quote_Line_Item__c cp20 = mapQuoteLineItems.get('CP-20');
+                    Quote_Line_Item__c persH2s = mapQuoteLineItems.get('Personell H2s');
+                    Quote_Line_Item__c m15 = mapQuoteLineItems.get('M-15s');
+                    Quote_Line_Item__c groundCable = mapQuoteLineItems.get('Ground Cable');
+                    Quote_Line_Item__c vacHose = mapQuoteLineItems.get('Vac Hoses');
+                    Quote_Line_Item__c waterHose = mapQuoteLineItems.get('Water Hoses');
+                    Quote_Line_Item__c jetPump = mapQuoteLineItems.get('Jet Pump');
+                    Quote_Line_Item__c gamaJet = mapQuoteLineItems.get('Gama Jet');
+                    Quote_Line_Item__c M30 = mapQuoteLineItems.get('M30');
+                    Quote_Line_Item__c flashLight = mapQuoteLineItems.get('Flash Lights');
+                    Quote_Line_Item__c tankLight = mapQuoteLineItems.get('Tank Lights');
+                    Quote_Line_Item__c vacumTrucks = mapQuoteLineItems.get('Vacuum Trucks');
+                    Quote_Line_Item__c freshAir = mapQuoteLineItems.get('Fresh Air');
+                    Quote_Line_Item__c airHose = mapQuoteLineItems.get('Air Hose');
+                    Quote_Line_Item__c hotPWasher = mapQuoteLineItems.get('Hot Pressure Washer');
                     //shifts
-                    Quote_Line_Item__c pontoonMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Pontoon MatShifts'];
-                    Quote_Line_Item__c washMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Wash MatShifts'];
-                    Quote_Line_Item__c hotWashMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'HotWash MatShifts'];
-                    Quote_Line_Item__c MOBMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'MOB MatShifts'];
-                    Quote_Line_Item__c DeMOBMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'DeMOB MatShifts'];
-                    Quote_Line_Item__c drainMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Drain MatShifts'];
-                    Quote_Line_Item__c scaleMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Scale MatShifts'];
-                    Quote_Line_Item__c legsMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Legs MatShifts'];
-                    Quote_Line_Item__c cribbingMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Cribbing MatShifts'];
-                    Quote_Line_Item__c vacuumMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'Vacuum MatShifts'];
-                    Quote_Line_Item__c bottleWashMatShift = [SELECT id,Name, Ext__c, PPE__c,Total__c FROM Quote_Line_Item__c WHERE Quote__c =: quoteId AND Name__c =: 'BottleWash MatShifts'];
+                    Quote_Line_Item__c pontoonMatShift = mapQuoteLineItems.get('Pontoon MatShifts');
+                    Quote_Line_Item__c washMatShift = mapQuoteLineItems.get('Wash MatShifts');
+                    Quote_Line_Item__c hotWashMatShift = mapQuoteLineItems.get('HotWash MatShifts');
+                    Quote_Line_Item__c MOBMatShift = mapQuoteLineItems.get('MOB MatShifts');
+                    Quote_Line_Item__c DeMOBMatShift = mapQuoteLineItems.get('DeMOB MatShifts');
+                    Quote_Line_Item__c drainMatShift = mapQuoteLineItems.get('Drain MatShifts');
+                    Quote_Line_Item__c scaleMatShift = mapQuoteLineItems.get('Scale MatShifts');
+                    Quote_Line_Item__c legsMatShift = mapQuoteLineItems.get('Legs MatShifts');
+                    Quote_Line_Item__c cribbingMatShift = mapQuoteLineItems.get('Cribbing MatShifts');
+                    Quote_Line_Item__c vacuumMatShift = mapQuoteLineItems.get('Vacuum MatShifts');
+                    Quote_Line_Item__c bottleWashMatShift = mapQuoteLineItems.get('BottleWash MatShifts');
                                         
                     For ( Quote_Line_Item__c qli2 : quoteLineItem2){
                         //Materials totals by type                           
